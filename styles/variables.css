@@ -1,0 +1,6 @@
+/* Theme variables (also in Tailwind) */
+:root {
+  --primary: #2563eb;
+  --accent: #38bdf8;
+  --background: #f8fafc;
+}
