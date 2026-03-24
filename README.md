@@ -76,4 +76,4 @@ Built with Next.js 14, TypeScript, TailwindCSS, Framer Motion, Firebase, and Clo
 
 ---
 
-**Built by Inara Tech**
+**Built by [Inara Tech](https://www.inaratech.com.np)**
