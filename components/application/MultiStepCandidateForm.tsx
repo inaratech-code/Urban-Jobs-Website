@@ -53,7 +53,7 @@ function toCandidateFormData(f: ApplicationFormState): CandidateFormData {
       industryCategory: f.industry,
       desiredRole: "Skilled — " + f.industry,
       education: "See resume",
-      skills: f.skillTags.join(", "),
+      skills: f.skills.trim(),
       experience: f.experience,
       preferredJob: f.industry,
     };
@@ -131,7 +131,7 @@ export default function MultiStepCandidateForm({ applyJobId }: MultiStepCandidat
           if (!form.industry) e.industry = "Select an industry";
           break;
         case "skillsExp":
-          if (form.skillTags.length === 0) e.skills = "Add at least one skill";
+          if (!form.skills.trim()) e.skills = "Enter your skills";
           if (!form.experience) e.experience = "Select experience level";
           break;
         case "resumeCerts":
@@ -365,8 +365,8 @@ export default function MultiStepCandidateForm({ applyJobId }: MultiStepCandidat
             {currentKey === "skillsExp" && (
               <StepContainer title="Skills & experience" subtitle="Help employers understand your background.">
                 <SkillsTagInput
-                  tags={form.skillTags}
-                  onChange={(tags) => update("skillTags", tags)}
+                  value={form.skills}
+                  onChange={(v) => update("skills", v)}
                   error={errors.skills}
                 />
                 <FormDropdown
@@ -542,7 +542,7 @@ export default function MultiStepCandidateForm({ applyJobId }: MultiStepCandidat
                       </div>
                       <div className="flex flex-col gap-1">
                         <dt className="text-slate-500">Skills</dt>
-                        <dd className="font-medium text-slate-900">{form.skillTags.join(", ")}</dd>
+                        <dd className="font-medium text-slate-900 whitespace-pre-wrap">{form.skills.trim() || "—"}</dd>
                       </div>
                       <div className="flex justify-between gap-3">
                         <dt className="text-slate-500">Experience</dt>

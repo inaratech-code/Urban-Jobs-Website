@@ -46,7 +46,8 @@ export function getStepOrder(tier: JobTier): StepKey[] {
 export interface ApplicationFormState {
   jobTier: JobTier;
   industry: string;
-  skillTags: string[];
+  /** Free-form skills text (typed normally, not tag chips). */
+  skills: string;
   experience: ExperienceValue | "";
   resumeFile: File | null;
   certificateFiles: File[];
@@ -61,7 +62,7 @@ export interface ApplicationFormState {
 export const initialApplicationState: ApplicationFormState = {
   jobTier: "",
   industry: "",
-  skillTags: [],
+  skills: "",
   experience: "",
   resumeFile: null,
   certificateFiles: [],
