@@ -7,11 +7,27 @@ const config: Config = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
+    screens: {
+      xs: "400px",
+      sm: "640px",
+      md: "768px",
+      lg: "1024px",
+      xl: "1280px",
+      "2xl": "1536px",
+    },
     extend: {
       colors: {
-        primary: "#2563eb",
-        accent: "#38bdf8",
-        background: "#f8fafc",
+        primary: "#2561c2",
+        /** Lighter blue on the same axis as primary rgb(37, 97, 194) */
+        accent: "#4a7fd9",
+        background: "#f3f4f6",
+        /** Dual CTAs — both use logo blues (primary + accent) */
+        cta: {
+          job: "#2561c2",
+          "job-hover": "#1a4f99",
+          hire: "#4a7fd9",
+          "hire-hover": "#3b72c9",
+        },
       },
       fontFamily: {
         sans: ["var(--font-inter)", "Inter", "sans-serif"],

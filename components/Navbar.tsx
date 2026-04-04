@@ -1,76 +1,107 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { HiOutlineBriefcase, HiOutlineUser, HiOutlineBuildingOffice2 } from "react-icons/hi2";
+import { HiOutlineBuildingOffice2 } from "react-icons/hi2";
 import { useState } from "react";
+import BrandLogo from "@/components/BrandLogo";
 
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/jobs", label: "Jobs" },
-  { href: "/candidate", label: "Fill the form" },
-  { href: "/employer", label: "Post a Job" },
+const moreLinks = [
+  { href: "/job-request", label: "Request a job" },
 ];
 
 export default function Navbar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const hiringActive =
+    pathname === "/employer" || pathname.startsWith("/employer");
 
   return (
     <motion.header
-      initial={{ y: -20, opacity: 0 }}
+      initial={{ y: -12, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.4 }}
-      className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-slate-200/80 shadow-soft"
+      transition={{ duration: 0.35 }}
+      className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm pt-[env(safe-area-inset-top,0px)]"
     >
       <nav className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <Link href="/" className="flex items-center gap-3 group">
-            <span className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-soft group-hover:shadow-soft-lg transition-shadow overflow-hidden">
-              <Image
-                src="/logo.png"
-                alt="Urban Jobs"
-                fill
-                sizes="48px"
-                priority
-                className="object-cover"
-              />
-            </span>
-            <span className="font-display font-semibold text-lg text-slate-800">
+        <div className="flex items-center justify-between gap-3 h-16 md:h-[4.25rem]">
+          <Link
+            href="/"
+            className="flex items-center gap-2.5 min-w-0 group shrink-0"
+            onClick={() => setMobileOpen(false)}
+          >
+            <BrandLogo height={44} priority className="group-hover:opacity-90 transition-opacity" />
+            <span className="font-display font-bold text-lg sm:text-xl text-slate-900 tracking-tight hidden sm:inline">
               Urban Jobs
             </span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  pathname === link.href
-                    ? "bg-primary text-white shadow-soft"
-                    : "text-slate-600 hover:bg-slate-100 hover:text-primary"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+          {/* WorkIndia-style audience switcher — desktop */}
+          <div className="hidden lg:flex items-center rounded-full bg-slate-100 p-1 border border-slate-200/80">
+            <Link
+              href="/jobs"
+              className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
+                !hiringActive
+                  ? "bg-white text-slate-900 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              Browse jobs
+            </Link>
+            <Link
+              href="/employer"
+              className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
+                hiringActive
+                  ? "bg-white text-slate-900 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              Hiring
+            </Link>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="hidden md:flex items-center gap-2 shrink-0">
+            <Link
+              href="/jobs"
+              className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-colors shadow-sm"
+            >
+              Browse jobs
+            </Link>
+            <Link
+              href="/candidate"
+              className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-cta-job hover:bg-cta-job-hover transition-colors shadow-sm"
+            >
+              Fill a form
+            </Link>
+            <Link
+              href="/employer"
+              className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-cta-hire hover:bg-cta-hire-hover transition-colors shadow-sm"
+            >
+              Hire now
+            </Link>
             <Link
               href="/admin"
-              className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-100 text-sm"
+              className="ml-1 p-2 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+              title="Admin"
             >
-              <HiOutlineBuildingOffice2 className="h-4 w-4" />
-              Admin
+              <HiOutlineBuildingOffice2 className="h-5 w-5" />
+            </Link>
+          </div>
+
+          <div className="flex md:hidden items-center gap-2">
+            <Link
+              href="/candidate"
+              className="px-3 py-2 rounded-lg text-xs font-semibold text-white bg-cta-job"
+              onClick={() => setMobileOpen(false)}
+            >
+              Fill a form
             </Link>
             <button
               type="button"
-              className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100"
+              className="p-2 rounded-lg text-slate-600 hover:bg-slate-100"
               onClick={() => setMobileOpen(!mobileOpen)}
+              aria-expanded={mobileOpen}
               aria-label="Toggle menu"
             >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -88,35 +119,63 @@ export default function Navbar() {
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden py-4 border-t border-slate-200"
+            className="md:hidden border-t border-slate-100 py-4 space-y-3"
           >
-            <div className="flex flex-col gap-1">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  className={`px-4 py-3 rounded-lg text-sm font-medium ${
-                    pathname === link.href ? "bg-primary text-white" : "text-slate-600 hover:bg-slate-100"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
+            <div className="flex rounded-xl bg-slate-100 p-1">
               <Link
-                href="/admin"
+                href="/jobs"
                 onClick={() => setMobileOpen(false)}
-                className="px-4 py-3 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 flex items-center gap-2"
+                className={`flex-1 text-center py-2.5 rounded-lg text-sm font-semibold ${
+                  !hiringActive ? "bg-white shadow-sm text-slate-900" : "text-slate-600"
+                }`}
               >
-                <HiOutlineBuildingOffice2 className="h-4 w-4" />
-                Admin
+                Browse jobs
+              </Link>
+              <Link
+                href="/employer"
+                onClick={() => setMobileOpen(false)}
+                className={`flex-1 text-center py-2.5 rounded-lg text-sm font-semibold ${
+                  hiringActive ? "bg-white shadow-sm text-slate-900" : "text-slate-600"
+                }`}
+              >
+                Hiring
               </Link>
             </div>
+            <Link
+              href="/candidate"
+              onClick={() => setMobileOpen(false)}
+              className="block w-full text-center py-3 rounded-xl font-semibold text-white bg-cta-job"
+            >
+              Fill a form
+            </Link>
+            <Link
+              href="/employer"
+              onClick={() => setMobileOpen(false)}
+              className="block w-full text-center py-3 rounded-xl font-semibold text-white bg-cta-hire"
+            >
+              Hire now
+            </Link>
+            {moreLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileOpen(false)}
+                className="block px-4 py-2.5 rounded-lg text-slate-700 hover:bg-slate-50 font-medium"
+              >
+                {link.label}
+              </Link>
+            ))}
+            <Link
+              href="/admin"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-2 px-4 py-2.5 text-slate-600"
+            >
+              <HiOutlineBuildingOffice2 className="h-4 w-4" />
+              Admin
+            </Link>
           </motion.div>
         )}
       </nav>
     </motion.header>
   );
 }
-

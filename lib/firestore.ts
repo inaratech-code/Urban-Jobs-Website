@@ -13,7 +13,18 @@ import {
 } from "firebase/firestore/lite";
 import { db } from "./firebase";
 import { uploadToCloudinary } from "./cloudinary";
-import type { Candidate, CandidateFormData, Job, JobFormData, Employer, Application, ApplicationStatus } from "@/types";
+import type {
+  Candidate,
+  CandidateFormData,
+  Job,
+  JobFormData,
+  Employer,
+  Application,
+  ApplicationStatus,
+  CandidateWorkflowStatus,
+  EmployerJobPipelineStatus,
+  JobRequest,
+} from "@/types";
 
 /** Public job listing: active and not explicitly pending (legacy docs without adminApproved stay visible). */
 export function isJobPublicVisible(job: Job) {
@@ -34,19 +45,38 @@ const COLLECTIONS = {
   employers: "employers",
   jobs: "jobs",
   applications: "applications",
+  jobRequests: "job_requests",
 } as const;
 
 // Candidates
+/**
+ * @param resumeFile — skilled: resume → documentIdURL. Omit if using photo only (unskilled).
+ * @param passportPhotoFile — optional extra photo; if only this is set (no resume), used as documentIdURL.
+ */
 export async function createCandidate(
   data: CandidateFormData,
-  documentIdFile: File,
-  passportPhotoFile: File,
-  certificates?: File[]
+  resumeFile: File | null | undefined,
+  passportPhotoFile: File | null | undefined,
+  certificates?: File[],
+  options?: { allowEmptyDocuments?: boolean }
 ): Promise<string> {
-  const [documentIdURL, passportPhotoURL] = await Promise.all([
-    uploadToCloudinary(documentIdFile, "urban-jobs/candidate-document-id"),
-    uploadToCloudinary(passportPhotoFile, "urban-jobs/candidate-passport-photo"),
-  ]);
+  let documentIdURL: string;
+  let passportPhotoURL: string;
+
+  if (resumeFile) {
+    documentIdURL = await uploadToCloudinary(resumeFile, "urban-jobs/candidate-resume");
+    passportPhotoURL = passportPhotoFile
+      ? await uploadToCloudinary(passportPhotoFile, "urban-jobs/candidate-passport-photo")
+      : documentIdURL;
+  } else if (passportPhotoFile) {
+    documentIdURL = await uploadToCloudinary(passportPhotoFile, "urban-jobs/candidate-photo");
+    passportPhotoURL = documentIdURL;
+  } else if (options?.allowEmptyDocuments) {
+    documentIdURL = "";
+    passportPhotoURL = "";
+  } else {
+    throw new Error("Please upload a resume or a profile photo before submitting.");
+  }
 
   const certificateURLs = certificates?.length
     ? await Promise.all(
@@ -61,6 +91,7 @@ export async function createCandidate(
     documentIdURL,
     passportPhotoURL,
     certificateURLs,
+    workflowStatus: "New" satisfies CandidateWorkflowStatus,
     createdAt: Timestamp.now(),
   });
   return docRef.id;
@@ -81,6 +112,13 @@ export async function getCandidate(id: string) {
 
 export async function deleteCandidate(id: string) {
   await deleteDoc(doc(db, COLLECTIONS.candidates, id));
+}
+
+export async function updateCandidate(
+  id: string,
+  data: Partial<Pick<Candidate, "workflowStatus">>
+) {
+  await updateDoc(doc(db, COLLECTIONS.candidates, id), data as Record<string, unknown>);
 }
 
 // Employers
@@ -109,7 +147,7 @@ export async function getEmployers() {
 
 export async function updateEmployer(
   id: string,
-  data: Partial<Pick<Employer, "approved" | "disabled">>
+  data: Partial<Pick<Employer, "approved" | "disabled" | "employerTagId" | "industryCategory">>
 ) {
   await updateDoc(doc(db, COLLECTIONS.employers, id), data as Record<string, unknown>);
 }
@@ -177,8 +215,7 @@ export async function getJobs(filters?: {
     jobs = jobs.filter(
       (j) =>
         j.title?.toLowerCase().includes(s) ||
-        j.companyName?.toLowerCase().includes(s) ||
-        j.description?.toLowerCase().includes(s)
+        j.category?.toLowerCase().includes(s)
     );
   }
   return jobs;
@@ -205,6 +242,8 @@ export async function updateJob(
       | "status"
       | "adminApproved"
       | "featured"
+      | "pipelineStatus"
+      | "openings"
     >
   >
 ) {
@@ -284,5 +323,29 @@ export async function getWebViews() {
     id: d.id,
     ...(d.data() as { path: string; createdAt: unknown }),
   }));
+}
+
+// Public job request (unavailable role)
+export async function createJobRequest(data: {
+  fullName: string;
+  phone: string;
+  desiredRole: string;
+  message?: string;
+}) {
+  const docRef = await addDoc(collection(db, COLLECTIONS.jobRequests), {
+    ...data,
+    createdAt: Timestamp.now(),
+  });
+  return docRef.id;
+}
+
+export async function getJobRequests() {
+  const snap = await getDocs(
+    query(collection(db, COLLECTIONS.jobRequests), orderBy("createdAt", "desc"))
+  );
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  })) as (JobRequest & { id: string })[];
 }
 

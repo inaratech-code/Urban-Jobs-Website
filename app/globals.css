@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 :root {
-  --primary: #2563eb;
-  --accent: #38bdf8;
-  --background: #f8fafc;
+  --primary: #2561c2;
+  --accent: #4a7fd9;
+  --background: #f3f4f6;
 }
 
 body {
@@ -13,8 +13,17 @@ body {
   color: #0f172a;
 }
 
+/* Mobile / tablet: avoid horizontal scroll; desktop keeps normal overflow */
+@supports (overflow: clip) {
+  html {
+    overflow-x: clip;
+  }
+}
+
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 @media (prefers-reduced-motion: reduce) {

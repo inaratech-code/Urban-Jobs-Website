@@ -58,8 +58,8 @@ export default function AdminJobsPage() {
     <div>
       <h1 className="font-display text-2xl font-bold text-slate-800">Job management</h1>
       <p className="mt-1 text-slate-600">
-        Approve new listings before they appear on the site. Use <span className="font-medium">Featured</span> to show an
-        approved job on the home page.
+        Approve new listings before they appear on the site. Use <span className="font-medium">Featured</span> to mark
+        roles for optional highlight use.
       </p>
       {loading ? (
         <div className="mt-8">
@@ -129,7 +129,7 @@ export default function AdminJobsPage() {
                       <span
                         className={
                           j.status === "active"
-                            ? "text-green-600 text-sm"
+                            ? "text-primary text-sm"
                             : "text-slate-500 text-sm"
                         }
                       >
@@ -141,8 +141,8 @@ export default function AdminJobsPage() {
                     <span
                       className={
                         j.adminApproved === false
-                          ? "text-amber-600 text-sm font-medium"
-                          : "text-green-600 text-sm"
+                          ? "text-slate-600 text-sm font-medium"
+                          : "text-primary text-sm"
                       }
                     >
                       {approvalLabel(j)}
@@ -208,7 +208,7 @@ export default function AdminJobsPage() {
                             <button
                               type="button"
                               onClick={() => handleClose(j.id)}
-                              className="p-2 rounded-lg text-slate-500 hover:bg-amber-50 hover:text-amber-600"
+                              className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-700"
                               title="Close"
                             >
                               <HiOutlineXCircle className="h-5 w-5" />

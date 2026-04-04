@@ -1,3 +1,5 @@
+export type { CandidateWorkflowStatus, EmployerJobPipelineStatus } from "./workflow";
+export type { JobRequest } from "./jobRequest";
 export type { Job, JobCategory, JobFormData } from "./job";
 export type { Candidate, CandidateFormData } from "./candidate";
 export type { Employer } from "./employer";

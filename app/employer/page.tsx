@@ -25,21 +25,27 @@ export default function EmployerPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-1 py-8 sm:py-12">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+      <main className="flex-1 py-6 sm:py-10 md:py-12">
+        <div className="max-w-2xl md:max-w-3xl mx-auto px-4 sm:px-6 md:px-8 lg:px-8">
+          <div className="rounded-2xl mb-6 sm:mb-8 bg-gradient-to-r from-cta-hire to-primary p-6 sm:p-8 text-white shadow-md border border-white/10">
+            <h1 className="font-display font-bold text-xl sm:text-2xl md:text-3xl">Post a job</h1>
+            <p className="text-white/90 text-sm mt-2">
+              Hire faster — reach job seekers in Dhangadhi.
+            </p>
+          </div>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-2xl shadow-soft border border-slate-100 p-6 sm:p-8"
           >
             <div className="flex items-center gap-3 mb-8">
-              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-cta-hire/15 text-cta-hire">
                 <HiOutlineBuildingOffice2 className="h-6 w-6" />
               </span>
               <div>
-                <h1 className="font-display text-2xl font-bold text-slate-800">
-                  Post a job
-                </h1>
+                <h2 className="font-display text-2xl font-bold text-slate-800">
+                  Job details
+                </h2>
                 <p className="text-slate-600 text-sm">
                   Reach local talent in Dhangadhi
                 </p>
@@ -52,7 +58,7 @@ export default function EmployerPage() {
                 animate={{ opacity: 1, scale: 1 }}
                 className="text-center py-8"
               >
-                <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-green-600 mb-4">
+                <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/15 text-primary mb-4">
                   <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>

@@ -1,6 +1,6 @@
 import HomeContent from "@/components/HomeContent";
-import { getJobs, isJobFeaturedOnHome } from "@/lib/firestore";
-import { serializeJobForClient } from "@/lib/utils";
+import { getJobs } from "@/lib/firestore";
+import { summarizeJobsByCategory } from "@/lib/job-summaries";
 import type { Job } from "@/types";
 
 export const metadata = {
@@ -18,10 +18,10 @@ export default async function HomePage() {
   } catch {
     jobs = [];
   }
-  const featuredJobs = jobs
-    .filter((j) => isJobFeaturedOnHome(j))
-    .slice(0, 6)
-    .map(serializeJobForClient);
+  const categorySummaries = summarizeJobsByCategory(jobs);
+  const totalJobs = jobs.length;
 
-  return <HomeContent featuredJobs={featuredJobs} />;
+  return (
+    <HomeContent categorySummaries={categorySummaries} totalJobs={totalJobs} />
+  );
 }

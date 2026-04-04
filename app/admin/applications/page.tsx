@@ -105,7 +105,7 @@ export default function AdminApplicationsPage() {
                     <span
                       className={`inline-flex px-2 py-1 rounded-lg text-xs font-medium ${
                         a.status === "Hired"
-                          ? "bg-green-100 text-green-700"
+                          ? "bg-primary/10 text-primary"
                           : a.status === "Rejected"
                             ? "bg-red-100 text-red-700"
                             : a.status === "Shortlisted"

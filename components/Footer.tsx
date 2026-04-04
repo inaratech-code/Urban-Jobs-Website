@@ -1,57 +1,82 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { motion } from "framer-motion";
+import BrandLogo from "@/components/BrandLogo";
+
+const jobSeeker = [
+  { href: "/jobs", label: "Browse jobs" },
+  { href: "/candidate", label: "Fill a form" },
+  { href: "/job-request", label: "Request a job" },
+];
+
 export default function Footer() {
   return (
     <motion.footer
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true }}
-      className="bg-slate-800 text-slate-300 mt-auto"
+      className="bg-slate-900 text-slate-300 mt-auto"
     >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
-            <span className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 overflow-hidden">
-              <Image
-                src="/logo.png"
-                alt="Urban Jobs"
-                fill
-                sizes="56px"
-                className="object-cover"
-              />
-            </span>
-            <div>
-              <p className="font-display font-semibold text-white">Urban Jobs</p>
-              <p className="text-sm">Connecting Talent with Opportunity</p>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-14">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
+          <div className="sm:col-span-2 lg:col-span-1">
+            <div className="flex items-center gap-3">
+              <BrandLogo height={48} />
+              <div>
+                <p className="font-display font-bold text-white text-lg">Urban Jobs</p>
+                <p className="text-sm text-slate-400 mt-0.5">Connecting talent in Dhangadhi</p>
+              </div>
             </div>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
-            <Link href="/" className="hover:text-white transition-colors">
-              Home
-            </Link>
-            <Link href="/jobs" className="hover:text-white transition-colors">
-              Jobs
-            </Link>
-            <Link href="/candidate" className="hover:text-white transition-colors">
-              Fill the form
-            </Link>
-            <Link href="/employer" className="hover:text-white transition-colors">
-              Post a Job
-            </Link>
+          <div>
+            <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">I want a job</p>
+            <ul className="space-y-2.5 text-sm">
+              {jobSeeker.map((l) => (
+                <li key={l.href + l.label}>
+                  <Link href={l.href} className="text-slate-300 hover:text-white transition-colors">
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">I want to hire</p>
+            <ul className="space-y-2.5 text-sm">
+              <li>
+                <Link href="/employer" className="text-slate-300 hover:text-white transition-colors">
+                  Post a job / Hire now
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Site</p>
+            <ul className="space-y-2.5 text-sm">
+              <li>
+                <Link href="/" className="text-slate-300 hover:text-white transition-colors">
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link href="/admin" className="text-slate-300 hover:text-white transition-colors">
+                  Admin
+                </Link>
+              </li>
+            </ul>
           </div>
         </div>
-        <div className="mt-8 pt-8 border-t border-slate-700 text-center text-sm">
+
+        <div className="mt-12 pt-8 border-t border-slate-800 text-center text-sm text-slate-500">
           <p>© {new Date().getFullYear()} Urban Jobs. All rights reserved.</p>
-          <p className="mt-1 text-slate-500">
+          <p className="mt-2">
             Built by{" "}
             <a
               href="https://www.inaratech.com.np"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-accent font-medium hover:text-accent/90 hover:underline"
+              className="text-accent font-medium hover:text-sky-300 hover:underline"
             >
               Inara Tech
             </a>
@@ -61,4 +86,3 @@ export default function Footer() {
     </motion.footer>
   );
 }
-

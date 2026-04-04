@@ -1,3 +1,5 @@
+import type { CandidateWorkflowStatus } from "./workflow";
+
 export interface Candidate {
   id: string;
   fullName: string;
@@ -15,6 +17,8 @@ export interface Candidate {
   documentIdURL: string;
   passportPhotoURL: string;
   certificateURLs?: string[];
+  /** Admin workflow status */
+  workflowStatus?: CandidateWorkflowStatus;
   createdAt: { seconds: number; nanoseconds: number } | Date;
 }
 

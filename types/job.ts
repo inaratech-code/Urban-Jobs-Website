@@ -1,3 +1,5 @@
+import type { EmployerJobPipelineStatus } from "./workflow";
+
 export type JobCategory =
   | "Teaching Jobs"
   | "Hotel Management"
@@ -23,6 +25,10 @@ export interface Job {
   /** ISO string when passed from Server Components to clients; Firestore Timestamp or plain seconds object when from DB. */
   createdAt: { seconds: number; nanoseconds: number } | Date | string;
   companyName?: string;
+  /** Admin pipeline (employer jobs) */
+  pipelineStatus?: EmployerJobPipelineStatus;
+  /** Optional vacancy count for listings */
+  openings?: number;
 }
 
 export interface JobFormData {

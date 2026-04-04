@@ -4,14 +4,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState } from "react";
 import { HiOutlineMagnifyingGlass } from "react-icons/hi2";
 
-const CATEGORIES = [
-  "Teaching Jobs",
-  "Hotel Management",
-  "Reception / Admin",
-  "Accounting",
-  "IT / Management",
-];
-
 export default function JobsFilters() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -38,7 +30,7 @@ export default function JobsFilters() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && apply()}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-cta-job/25 focus:border-cta-job outline-none"
           />
         </div>
         <input
@@ -46,14 +38,14 @@ export default function JobsFilters() {
           placeholder="Location"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
-          className="px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+          className="px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-cta-job/25 focus:border-cta-job outline-none"
         />
       </div>
       <div className="mt-4 flex justify-end">
         <button
           type="button"
           onClick={apply}
-          className="px-5 py-2.5 rounded-xl bg-primary text-white font-medium hover:bg-primary/90 transition-colors"
+          className="px-5 py-2.5 rounded-xl bg-cta-job text-white font-semibold hover:bg-cta-job-hover transition-colors"
         >
           Apply filters
         </button>

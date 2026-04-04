@@ -4,14 +4,16 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import JobCard from "@/components/JobCard";
-import type { Job } from "@/types";
 import {
   HiOutlineBriefcase,
   HiOutlineDocumentText,
   HiOutlineUserPlus,
   HiOutlineDocumentDuplicate,
   HiOutlineBuildingOffice2,
+  HiOutlineMagnifyingGlass,
+  HiOutlineMapPin,
+  HiOutlineCheckCircle,
+  HiOutlineClipboardDocumentList,
 } from "react-icons/hi2";
 
 const CATEGORIES = [
@@ -22,7 +24,7 @@ const CATEGORIES = [
   { label: "IT / Management", href: "/jobs?category=IT+%2F+Management" },
 ];
 
-const STEPS = [
+const CANDIDATE_STEPS = [
   {
     title: "Make your profile",
     description: "Tell us who you are and what work you can do.",
@@ -35,190 +37,280 @@ const STEPS = [
   },
   {
     title: "Get matched",
-    description: "Employers will find your profile and contact you for interviews.",
+    description: "Employers find your profile and contact you for interviews.",
     icon: HiOutlineBriefcase,
   },
 ];
 
+const EMPLOYER_STEPS = [
+  {
+    title: "Post a job",
+    description: "Tell us what you need in a candidate in just a few minutes.",
+    icon: HiOutlineDocumentText,
+  },
+  {
+    title: "Get verified",
+    description: "Our team reviews your listing so candidates see trusted posts.",
+    icon: HiOutlineCheckCircle,
+  },
+  {
+    title: "Hire locally",
+    description: "Connect with applicants in Dhangadhi and hire faster.",
+    icon: HiOutlineBuildingOffice2,
+  },
+];
+
 interface HomeContentProps {
-  featuredJobs: (Job & { id: string })[];
+  categorySummaries: { label: string; count: number }[];
+  totalJobs: number;
 }
 
-export default function HomeContent({ featuredJobs }: HomeContentProps) {
+export default function HomeContent({
+  categorySummaries,
+  totalJobs,
+}: HomeContentProps) {
+  const categoryCount = categorySummaries.length;
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
 
       <main className="flex-1">
-        {/* Hero */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-accent/5 py-20 sm:py-28">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-800"
-            >
-              Find Jobs in <span className="text-primary">Dhangadhi</span>
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="mt-4 text-lg text-slate-600 max-w-2xl mx-auto"
-            >
-              Simple local job site for Dhangadhi. Find good work close to home.
-            </motion.p>
+        {/* Hero — WorkIndia-style: headline + dual CTA + search card */}
+        <section className="bg-white border-b border-slate-200">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 lg:px-8 py-10 sm:py-14 md:py-16 lg:py-20">
+            <div className="max-w-3xl mx-auto text-center">
+              <motion.p
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-sm font-semibold text-primary uppercase tracking-wide"
+              >
+                Dhangadhi job portal
+              </motion.p>
+              <motion.h1
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.05 }}
+                className="mt-3 font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 text-balance leading-tight"
+              >
+                Find jobs & hire staff — fast and simple
+              </motion.h1>
+              <motion.p
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="mt-4 text-lg text-slate-600 max-w-2xl mx-auto"
+              >
+                Urban Jobs connects job seekers and employers in Dhangadhi. Complete the candidate form to register your
+                profile, browse open roles below when you want listings, or post a vacancy as an employer.
+              </motion.p>
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 }}
+                className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3"
+              >
+                <Link
+                  href="/candidate"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl text-base font-semibold text-white bg-cta-job hover:bg-cta-job-hover shadow-md transition-colors"
+                >
+                  <HiOutlineClipboardDocumentList className="h-5 w-5 shrink-0" />
+                  Fill a form
+                </Link>
+                <Link
+                  href="/employer"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl text-base font-semibold text-white bg-cta-hire hover:bg-cta-hire-hover shadow-md transition-colors"
+                >
+                  <HiOutlineBuildingOffice2 className="h-5 w-5 shrink-0" />
+                  Hire now
+                </Link>
+              </motion.div>
+            </div>
+
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="mt-8 flex flex-wrap items-center justify-center gap-4"
+              transition={{ delay: 0.2 }}
+              className="mt-10 max-w-3xl mx-auto rounded-2xl border border-slate-200 bg-slate-50/80 p-4 sm:p-6 shadow-sm"
             >
-              <Link
-                href="/jobs"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-medium shadow-soft hover:shadow-soft-lg hover:bg-primary/90 transition-all duration-200"
-              >
-                <HiOutlineBriefcase className="h-5 w-5" />
-                Browse Jobs
-              </Link>
-              <Link
-                href="/candidate"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-primary font-medium border-2 border-primary shadow-soft hover:shadow-soft-lg hover:bg-primary/5 transition-all duration-200"
-              >
-                <HiOutlineDocumentText className="h-5 w-5" />
-                Fill the form
-              </Link>
+              <p className="text-center text-sm font-semibold text-slate-700 mb-4">Search jobs</p>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div className="relative">
+                  <HiOutlineMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                  <Link
+                    href="/jobs"
+                    className="flex items-center w-full pl-11 pr-4 py-3.5 rounded-xl bg-white border border-slate-200 text-left text-slate-800 font-medium hover:border-primary/40 hover:ring-1 hover:ring-primary/20 transition-all"
+                  >
+                    Browse all categories
+                  </Link>
+                </div>
+                <div className="relative">
+                  <HiOutlineMapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                  <div className="flex items-center w-full pl-11 pr-4 py-3.5 rounded-xl bg-white border border-slate-200 text-slate-600">
+                    Dhangadhi
+                  </div>
+                </div>
+              </div>
+              <div className="mt-4 flex flex-wrap justify-center gap-2">
+                {CATEGORIES.slice(0, 5).map((cat) => (
+                  <Link
+                    key={cat.href}
+                    href={cat.href}
+                    className="px-3 py-1.5 rounded-full text-xs font-medium bg-white border border-slate-200 text-slate-700 hover:border-primary hover:text-primary transition-colors"
+                  >
+                    {cat.label}
+                  </Link>
+                ))}
+              </div>
             </motion.div>
           </div>
         </section>
 
-        {/* How it works */}
-        <section className="py-16 sm:py-20 bg-white">
+        {/* Stats — WorkIndia-style trust strip */}
+        <section className="py-10 sm:py-12 bg-white border-b border-slate-100">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="font-display text-3xl font-bold text-slate-800 text-center"
-            >
-              How It Works
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="mt-2 text-slate-600 text-center max-w-xl mx-auto"
-            >
-              Three simple steps to connect with local employers.
-            </motion.p>
-            <div className="mt-12 grid md:grid-cols-3 gap-8">
-              {STEPS.map((step, i) => (
+            <p className="text-center text-sm text-slate-500 font-medium mb-8">
+              Local employers & job seekers use Urban Jobs
+            </p>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+              {[
+                { value: totalJobs > 0 ? String(totalJobs) : "—", title: "Open roles", sub: "Live listings" },
+                { value: categoryCount > 0 ? String(categoryCount) : "—", title: "Categories", sub: "Job types" },
+                { value: "Dhangadhi", title: "City", sub: "Local focus" },
+                { value: "Free", title: "Basic use", sub: "Browse or register" },
+              ].map((s) => (
+                <div key={s.title} className="text-center">
+                  <p className="font-display text-2xl sm:text-3xl font-bold text-slate-900">{s.value}</p>
+                  <p className="text-sm font-semibold text-slate-800 mt-1">{s.title}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{s.sub}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Featured Jobs — category summary */}
+        <section className="py-14 sm:py-16 bg-background">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center sm:text-left max-w-2xl sm:mx-0 mx-auto">
+              <h2 className="font-display text-2xl sm:text-3xl font-bold text-slate-900">Jobs by category</h2>
+              <p className="mt-2 text-slate-600">
+                {totalJobs > 0
+                  ? `${totalJobs} open role${totalJobs === 1 ? "" : "s"} across ${categoryCount || "several"} categories`
+                  : "New listings appear here when employers post roles."}
+              </p>
+            </div>
+
+            <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {categorySummaries.length > 0 ? (
+                categorySummaries.map((row) => (
+                  <li
+                    key={row.label}
+                    className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3.5 shadow-sm hover:border-slate-300 transition-colors"
+                  >
+                    <span className="font-medium text-slate-800">{row.label}</span>
+                    <span className="text-sm font-semibold text-cta-job">
+                      {row.count} job{row.count === 1 ? "" : "s"}
+                    </span>
+                  </li>
+                ))
+              ) : (
+                <li className="col-span-full rounded-xl border border-dashed border-slate-300 bg-white px-4 py-10 text-center text-slate-500">
+                  No jobs posted yet. Check back soon!
+                </li>
+              )}
+            </ul>
+
+            <p className="mt-8 text-center text-sm text-slate-600 max-w-xl mx-auto leading-relaxed">
+              If your desired job is not available, please submit a request — we will contact you soon.
+            </p>
+
+            <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link
+                href="/jobs"
+                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-primary text-white font-semibold shadow-md hover:opacity-95 transition-opacity w-full sm:w-auto"
+              >
+                Browse all jobs
+              </Link>
+              <Link
+                href="/job-request"
+                className="text-sm font-semibold text-primary hover:underline"
+              >
+                Request a job role
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Job seeker — how it works */}
+        <section className="py-14 sm:py-16 bg-white border-y border-slate-100">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="font-display text-2xl sm:text-3xl font-bold text-slate-900 text-center">
+              Get started in 3 easy steps
+            </h2>
+            <p className="mt-2 text-slate-600 text-center max-w-xl mx-auto">
+              For job seekers — build your profile and get discovered by local employers.
+            </p>
+            <div className="mt-10 grid md:grid-cols-3 gap-6">
+              {CANDIDATE_STEPS.map((step, i) => (
                 <motion.div
                   key={step.title}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 12 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className="text-center"
+                  transition={{ delay: i * 0.06 }}
+                  className="rounded-2xl border border-slate-200 bg-slate-50/50 p-6 text-center"
                 >
-                  <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-4">
+                  <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-cta-job/15 text-cta-job mb-4">
                     <step.icon className="h-7 w-7" />
                   </div>
-                  <p className="text-lg font-display font-semibold text-slate-800">
-                    Step {i + 1}
-                  </p>
-                  <h3 className="mt-1 font-display font-semibold text-slate-800">
-                    {step.title}
-                  </h3>
-                  <p className="mt-2 text-slate-600 text-sm">{step.description}</p>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Step {i + 1}</p>
+                  <h3 className="mt-1 font-display font-bold text-lg text-slate-900">{step.title}</h3>
+                  <p className="mt-2 text-slate-600 text-sm leading-relaxed">{step.description}</p>
                 </motion.div>
               ))}
             </div>
-          </div>
-        </section>
-
-        {/* Featured Jobs */}
-        <section className="py-16 sm:py-20 bg-background">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-            >
-              <div>
-                <h2 className="font-display text-3xl font-bold text-slate-800">
-                  Featured Jobs
-                </h2>
-                <p className="mt-1 text-slate-600">
-                  Latest opportunities in Dhangadhi
-                </p>
-              </div>
+            <div className="mt-10 text-center">
               <Link
-                href="/jobs"
-                className="text-primary font-medium hover:underline"
+                href="/candidate"
+                className="inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold text-white bg-cta-job hover:bg-cta-job-hover transition-colors"
               >
-                View all jobs →
+                Fill a form
               </Link>
-            </motion.div>
-            <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredJobs.length > 0 ? (
-                featuredJobs.map((job, i) => (
-                  <JobCard key={job.id} job={job} index={i} />
-                ))
-              ) : (
-                <p className="col-span-full text-center text-slate-500 py-8">
-                  No jobs posted yet. Check back soon!
-                </p>
-              )}
-            </div>
-            <div className="mt-8 flex flex-wrap gap-3 justify-center">
-              {CATEGORIES.map((cat) => (
-                <Link
-                  key={cat.label}
-                  href={cat.href}
-                  className="px-4 py-2 rounded-full bg-white border border-slate-200 text-slate-600 text-sm font-medium hover:border-primary hover:text-primary transition-colors"
-                >
-                  {cat.label}
-                </Link>
-              ))}
             </div>
           </div>
         </section>
 
-        {/* CTA */}
-        <section className="py-16 sm:py-20 bg-primary">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="font-display text-3xl font-bold text-white"
-            >
-              Looking for employees?
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="mt-2 text-white/90"
-            >
-              Post your job and reach local talent in Dhangadhi.
-            </motion.p>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-            >
+        {/* Employers — brand accent block + steps */}
+        <section className="py-14 sm:py-16 bg-primary text-white">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-2xl mx-auto">
+              <h2 className="font-display text-2xl sm:text-3xl font-bold">Hire staff for your business</h2>
+              <p className="mt-3 text-white/90 text-sm sm:text-base">
+                Post your vacancy and reach candidates in Dhangadhi. Simple forms, quick listing.
+              </p>
               <Link
                 href="/employer"
-                className="inline-flex items-center gap-2 mt-6 px-6 py-3 rounded-xl bg-white text-primary font-medium shadow-soft hover:shadow-soft-lg transition-all duration-200"
+                className="inline-flex items-center gap-2 mt-6 px-8 py-3.5 rounded-xl bg-white text-primary font-bold shadow-lg hover:bg-slate-50 transition-colors"
               >
-                <HiOutlineBuildingOffice2 className="h-5 w-5" />
-                Post a Job
+                Post a new job
               </Link>
-            </motion.div>
+            </div>
+            <div className="mt-12 grid md:grid-cols-3 gap-6">
+              {EMPLOYER_STEPS.map((step, i) => (
+                <div
+                  key={step.title}
+                  className="rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 p-6 text-center"
+                >
+                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-white/20 mb-3">
+                    <step.icon className="h-6 w-6 text-white" />
+                  </div>
+                  <p className="text-xs font-bold text-white/80 uppercase tracking-wide">Step {i + 1}</p>
+                  <h3 className="mt-1 font-display font-bold text-lg">{step.title}</h3>
+                  <p className="mt-2 text-white/85 text-sm leading-relaxed">{step.description}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       </main>

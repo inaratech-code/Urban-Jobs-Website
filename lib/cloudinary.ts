@@ -2,6 +2,24 @@ export async function uploadToCloudinary(
   file: File,
   folder = "urban-jobs/candidates"
 ): Promise<string> {
+  if (typeof window !== "undefined") {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("folder", folder);
+    const response = await fetch("/api/upload/cloudinary", {
+      method: "POST",
+      body: formData,
+    });
+    const json = (await response.json()) as { url?: string; error?: string };
+    if (!response.ok) {
+      throw new Error(json.error || "Upload failed.");
+    }
+    if (!json.url) {
+      throw new Error("Upload failed: no URL returned.");
+    }
+    return json.url;
+  }
+
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
   const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
@@ -36,4 +54,3 @@ export async function uploadToCloudinary(
 
   return json.secure_url;
 }
-
