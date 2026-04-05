@@ -3,19 +3,47 @@ import { getFirestore } from "firebase/firestore/lite";
 import { getStorage } from "firebase/storage";
 import { getAuth, Auth } from "firebase/auth";
 
-const hasConfig = Boolean(
-  process.env.NEXT_PUBLIC_FIREBASE_API_KEY &&
-  process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
-);
+const ENV_KEYS = [
+  "NEXT_PUBLIC_FIREBASE_API_KEY",
+  "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN",
+  "NEXT_PUBLIC_FIREBASE_PROJECT_ID",
+  "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET",
+  "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID",
+  "NEXT_PUBLIC_FIREBASE_APP_ID",
+] as const;
+
+function envTrim(key: (typeof ENV_KEYS)[number]): string | undefined {
+  const v = process.env[key]?.trim();
+  return v || undefined;
+}
+
+/** All six web config values must be set (NEXT_PUBLIC_* are baked in at build time on Vercel — redeploy after changes). */
+const hasConfig = ENV_KEYS.every((k) => Boolean(envTrim(k)));
+
+/** False when any Firebase web env var is missing — otherwise app used dummy project id `build`. */
+export const isFirebaseConfigured = hasConfig;
+
+export function assertFirebaseConfigured(): void {
+  if (!hasConfig) {
+    const missing = ENV_KEYS.filter((k) => !envTrim(k));
+    throw new Error(
+      "Firebase is not fully configured. Missing or empty: " +
+        missing.join(", ") +
+        ". Copy all six from Firebase Console → Project settings → Your apps → Web app. " +
+        "On Vercel, set them under Environment Variables for Production (and Preview if needed), then redeploy — " +
+        "NEXT_PUBLIC_* values are embedded at build time, not picked up on old deployments."
+    );
+  }
+}
 
 const firebaseConfig = hasConfig
   ? {
-      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-      messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-      appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+      apiKey: envTrim("NEXT_PUBLIC_FIREBASE_API_KEY"),
+      authDomain: envTrim("NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN"),
+      projectId: envTrim("NEXT_PUBLIC_FIREBASE_PROJECT_ID"),
+      storageBucket: envTrim("NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET"),
+      messagingSenderId: envTrim("NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID"),
+      appId: envTrim("NEXT_PUBLIC_FIREBASE_APP_ID"),
     }
   : {
       apiKey: "build-placeholder",

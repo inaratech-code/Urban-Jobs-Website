@@ -11,7 +11,7 @@ import {
   orderBy,
   Timestamp,
 } from "firebase/firestore/lite";
-import { db } from "./firebase";
+import { db, assertFirebaseConfigured, isFirebaseConfigured } from "./firebase";
 import { uploadToCloudinary } from "./cloudinary";
 import type {
   Candidate,
@@ -60,6 +60,8 @@ export async function createCandidate(
   certificates?: File[],
   options?: { allowEmptyDocuments?: boolean }
 ): Promise<string> {
+  assertFirebaseConfigured();
+
   let documentIdURL: string;
   let passportPhotoURL: string;
 
@@ -309,6 +311,7 @@ export async function getJobsForAdmin() {
 
 // Web analytics
 export async function trackWebView(path: string) {
+  if (!isFirebaseConfigured) return;
   await addDoc(collection(db, "web_analytics"), {
     path,
     createdAt: Timestamp.now(),
