@@ -3,29 +3,35 @@ import { getFirestore } from "firebase/firestore/lite";
 import { getStorage } from "firebase/storage";
 import { getAuth, Auth } from "firebase/auth";
 
-const ENV_KEYS = [
-  "NEXT_PUBLIC_FIREBASE_API_KEY",
-  "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN",
-  "NEXT_PUBLIC_FIREBASE_PROJECT_ID",
-  "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET",
-  "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID",
-  "NEXT_PUBLIC_FIREBASE_APP_ID",
-] as const;
-
-function envTrim(key: (typeof ENV_KEYS)[number]): string | undefined {
-  const v = process.env[key]?.trim();
-  return v || undefined;
-}
+/**
+ * Must use static `process.env.NEXT_PUBLIC_*` access — Next.js inlines these at build time.
+ * Dynamic access like `process.env[key]` is NOT replaced, so values are always undefined in the client bundle.
+ */
+const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY?.trim() || undefined;
+const authDomain = process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN?.trim() || undefined;
+const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID?.trim() || undefined;
+const storageBucket = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET?.trim() || undefined;
+const messagingSenderId =
+  process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID?.trim() || undefined;
+const appId = process.env.NEXT_PUBLIC_FIREBASE_APP_ID?.trim() || undefined;
 
 /** All six web config values must be set (NEXT_PUBLIC_* are baked in at build time on Vercel — redeploy after changes). */
-const hasConfig = ENV_KEYS.every((k) => Boolean(envTrim(k)));
+const hasConfig = Boolean(
+  apiKey && authDomain && projectId && storageBucket && messagingSenderId && appId
+);
 
 /** False when any Firebase web env var is missing — otherwise app used dummy project id `build`. */
 export const isFirebaseConfigured = hasConfig;
 
 export function assertFirebaseConfigured(): void {
   if (!hasConfig) {
-    const missing = ENV_KEYS.filter((k) => !envTrim(k));
+    const missing: string[] = [];
+    if (!apiKey) missing.push("NEXT_PUBLIC_FIREBASE_API_KEY");
+    if (!authDomain) missing.push("NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN");
+    if (!projectId) missing.push("NEXT_PUBLIC_FIREBASE_PROJECT_ID");
+    if (!storageBucket) missing.push("NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET");
+    if (!messagingSenderId) missing.push("NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID");
+    if (!appId) missing.push("NEXT_PUBLIC_FIREBASE_APP_ID");
     throw new Error(
       "Firebase is not fully configured. Missing or empty: " +
         missing.join(", ") +
@@ -38,12 +44,12 @@ export function assertFirebaseConfigured(): void {
 
 const firebaseConfig = hasConfig
   ? {
-      apiKey: envTrim("NEXT_PUBLIC_FIREBASE_API_KEY"),
-      authDomain: envTrim("NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN"),
-      projectId: envTrim("NEXT_PUBLIC_FIREBASE_PROJECT_ID"),
-      storageBucket: envTrim("NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET"),
-      messagingSenderId: envTrim("NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID"),
-      appId: envTrim("NEXT_PUBLIC_FIREBASE_APP_ID"),
+      apiKey: apiKey!,
+      authDomain: authDomain!,
+      projectId: projectId!,
+      storageBucket: storageBucket!,
+      messagingSenderId: messagingSenderId!,
+      appId: appId!,
     }
   : {
       apiKey: "build-placeholder",
@@ -72,4 +78,3 @@ try {
 }
 export const auth = _auth;
 export default app;
-
