@@ -14,7 +14,7 @@ export default function StepContainer({ title, subtitle, children, wide }: StepC
   return (
     <motion.div
       layout
-      className={`w-full rounded-2xl border border-white/60 bg-white/70 backdrop-blur-xl shadow-[0_8px_40px_-12px_rgba(37,97,194,0.25)] p-5 xs:p-6 sm:p-8 ${
+      className={`w-full mx-auto rounded-2xl border border-white/60 bg-white/70 backdrop-blur-xl shadow-[0_8px_40px_-12px_rgba(37,97,194,0.25)] p-5 xs:p-6 sm:p-8 ${
         wide
           ? "max-w-[min(100%,56rem)] xl:max-w-[60rem] 2xl:max-w-[64rem]"
           : "max-w-lg md:max-w-xl lg:max-w-2xl"
