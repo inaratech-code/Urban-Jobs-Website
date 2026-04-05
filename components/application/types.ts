@@ -6,8 +6,7 @@ export const EXPERIENCE_OPTIONS = [
 
 export type ExperienceValue = (typeof EXPERIENCE_OPTIONS)[number]["value"];
 
-/** `internship` = user chose Internship on the first screen; next step picks skilled vs entry-level track. */
-export type JobTier = "" | "skilled" | "unskilled" | "internship";
+export type JobTier = "" | "skilled" | "unskilled";
 
 export const SKILLED_INDUSTRIES = [
   "Internship",
@@ -38,7 +37,6 @@ export const EDUCATION_LEVEL_OPTIONS = [
 
 export type StepKey =
   | "tier"
-  | "internshipBranch"
   | "industry"
   | "education"
   | "skillsExp"
@@ -65,7 +63,6 @@ export function isInternship(form: {
 /** Step order depends on tier and whether Internship is selected (education → resume → docs/photo for internship). */
 export function getStepOrder(form: ApplicationFormState): StepKey[] {
   if (!form.jobTier) return ["tier"];
-  if (form.jobTier === "internship") return ["tier", "internshipBranch"];
 
   const intern = isInternship(form);
   const fromInternshipCard = form.internshipFromHome === true;
@@ -75,7 +72,6 @@ export function getStepOrder(form: ApplicationFormState): StepKey[] {
       if (fromInternshipCard) {
         return [
           "tier",
-          "internshipBranch",
           "education",
           "skillsExp",
           "resumeOnly",
@@ -103,7 +99,6 @@ export function getStepOrder(form: ApplicationFormState): StepKey[] {
       if (fromInternshipCard) {
         return [
           "tier",
-          "internshipBranch",
           "education",
           "resumeOnly",
           "internshipDocs",
@@ -121,7 +116,7 @@ export function getStepOrder(form: ApplicationFormState): StepKey[] {
 
 export interface ApplicationFormState {
   jobTier: JobTier;
-  /** True when user picked Internship on the first screen, then chose skilled vs entry-level (skips industry/job-type steps). */
+  /** True when user picked Internship on the first screen (skips industry step; skilled internship track). */
   internshipFromHome: boolean;
   industry: string;
   /** Free-form skills text (typed normally, not tag chips). */
