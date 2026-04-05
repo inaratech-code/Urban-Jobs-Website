@@ -32,7 +32,7 @@ export default function SelectionCard({
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       className={`
-        relative w-full text-left rounded-2xl border-2 p-6 sm:p-7 transition-shadow
+        relative w-full h-full min-h-[220px] sm:min-h-[240px] flex flex-col text-left rounded-2xl border-2 p-5 sm:p-6 lg:p-7 transition-shadow
         backdrop-blur-sm bg-white/80
         ${
           selected
@@ -46,14 +46,18 @@ export default function SelectionCard({
       )}
       <div
         className={`
-          inline-flex h-12 w-12 items-center justify-center rounded-xl mb-4
+          shrink-0 inline-flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-xl mb-3 sm:mb-4
           ${selected ? "bg-gradient-to-br from-primary to-accent text-white" : "bg-slate-100 text-slate-600"}
         `}
       >
-        <Icon className="h-6 w-6" />
+        <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
       </div>
-      <h3 className="font-display text-lg font-bold text-slate-900">{title}</h3>
-      <p className="mt-2 text-sm text-slate-600 leading-relaxed">{examples}</p>
+      <h3 className="shrink-0 font-display text-base sm:text-lg font-bold text-slate-900 leading-snug">
+        {title}
+      </h3>
+      <p className="mt-2 sm:mt-3 flex-1 min-h-[3.5rem] sm:min-h-[4rem] text-sm text-slate-600 leading-relaxed">
+        {examples}
+      </p>
     </motion.button>
   );
 }

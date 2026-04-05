@@ -375,7 +375,7 @@ export default function MultiStepCandidateForm({ applyJobId }: MultiStepCandidat
   }
 
   return (
-    <div className="w-full max-w-lg mx-auto flex flex-col min-h-[calc(100dvh-10rem)]">
+    <div className="w-full max-w-[min(100%,42rem)] sm:max-w-[min(100%,48rem)] lg:max-w-[min(100%,64rem)] mx-auto px-1 sm:px-2 flex flex-col min-h-[calc(100dvh-10rem)]">
       <div className="shrink-0 mb-6">
         <ProgressBar currentStep={displayStep} totalSteps={totalSteps} />
         <p className="text-center text-xs text-slate-500 mt-3 font-medium">{stepLabel[currentKey]}</p>
@@ -395,10 +395,11 @@ export default function MultiStepCandidateForm({ applyJobId }: MultiStepCandidat
           >
             {currentKey === "tier" && (
               <StepContainer
+                wide
                 title="What kind of work are you looking for?"
                 subtitle="Choose one — we’ll tailor the next questions for you."
               >
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 items-stretch w-full">
                   <SelectionCard
                     variant="skilled"
                     title="Skilled jobs"
@@ -424,7 +425,7 @@ export default function MultiStepCandidateForm({ applyJobId }: MultiStepCandidat
                   <SelectionCard
                     variant="internship"
                     title="Internship"
-                    examples="Education, resume, then documents & photo — professional or entry-level."
+                    examples="Education, resume, documents & photo. Professional or entry-level track."
                     selected={form.jobTier === "internship"}
                     onClick={() => {
                       setForm((prev) => ({ ...prev, jobTier: "internship", internshipFromHome: false }));
@@ -441,10 +442,11 @@ export default function MultiStepCandidateForm({ applyJobId }: MultiStepCandidat
 
             {currentKey === "internshipBranch" && (
               <StepContainer
+                wide
                 title="What kind of internship?"
                 subtitle="Professional internships usually need a degree track; entry-level includes on-the-job training."
               >
-                <div className="grid sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 items-stretch w-full max-w-3xl mx-auto lg:max-w-none">
                   <SelectionCard
                     variant="skilled"
                     title="Skilled / professional internship"
