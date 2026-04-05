@@ -9,6 +9,8 @@ type NavigationButtonsProps = {
   backLabel?: string;
   nextDisabled?: boolean;
   showBack?: boolean;
+  /** When false, the primary Next/Submit control is hidden (e.g. pick a card instead). */
+  showNext?: boolean;
   isLastStep?: boolean;
   loading?: boolean;
 };
@@ -20,6 +22,7 @@ export default function NavigationButtons({
   backLabel = "Back",
   nextDisabled = false,
   showBack = true,
+  showNext = true,
   isLastStep = false,
   loading = false,
 }: NavigationButtonsProps) {
@@ -39,30 +42,32 @@ export default function NavigationButtons({
           </motion.button>
         )}
       </div>
-      <motion.button
-        type="button"
-        whileHover={nextDisabled || loading ? {} : { scale: 1.02 }}
-        whileTap={nextDisabled || loading ? {} : { scale: 0.98 }}
-        onClick={onNext}
-        disabled={nextDisabled || loading}
-        className={`
-          w-full sm:w-auto min-w-[140px] px-8 py-3.5 rounded-2xl font-semibold text-white shadow-lg
-          bg-gradient-to-r from-primary to-accent hover:opacity-95
-          disabled:opacity-45 disabled:cursor-not-allowed disabled:shadow-none
-          transition-opacity
-        `}
-      >
-        {loading ? (
-          <span className="inline-flex items-center gap-2">
-            <span className="h-4 w-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-            Submitting…
-          </span>
-        ) : isLastStep ? (
-          "Submit application"
-        ) : (
-          nextLabel
-        )}
-      </motion.button>
+      {showNext && onNext && (
+        <motion.button
+          type="button"
+          whileHover={nextDisabled || loading ? {} : { scale: 1.02 }}
+          whileTap={nextDisabled || loading ? {} : { scale: 0.98 }}
+          onClick={onNext}
+          disabled={nextDisabled || loading}
+          className={`
+            w-full sm:w-auto min-w-[140px] px-8 py-3.5 rounded-2xl font-semibold text-white shadow-lg
+            bg-gradient-to-r from-primary to-accent hover:opacity-95
+            disabled:opacity-45 disabled:cursor-not-allowed disabled:shadow-none
+            transition-opacity
+          `}
+        >
+          {loading ? (
+            <span className="inline-flex items-center gap-2">
+              <span className="h-4 w-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              Submitting…
+            </span>
+          ) : isLastStep ? (
+            "Submit application"
+          ) : (
+            nextLabel
+          )}
+        </motion.button>
+      )}
     </div>
   );
 }

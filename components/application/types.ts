@@ -6,7 +6,8 @@ export const EXPERIENCE_OPTIONS = [
 
 export type ExperienceValue = (typeof EXPERIENCE_OPTIONS)[number]["value"];
 
-export type JobTier = "" | "skilled" | "unskilled";
+/** `internship` = user chose Internship on the first screen; next step picks skilled vs entry-level track. */
+export type JobTier = "" | "skilled" | "unskilled" | "internship";
 
 export const SKILLED_INDUSTRIES = [
   "Internship",
@@ -37,6 +38,7 @@ export const EDUCATION_LEVEL_OPTIONS = [
 
 export type StepKey =
   | "tier"
+  | "internshipBranch"
   | "industry"
   | "education"
   | "skillsExp"
@@ -49,7 +51,11 @@ export type StepKey =
   | "photoUnskilled"
   | "review";
 
-export function isInternship(form: { jobTier: JobTier; industry: string; unskilledJobType: string }): boolean {
+export function isInternship(form: {
+  jobTier: JobTier;
+  industry: string;
+  unskilledJobType: string;
+}): boolean {
   return (
     (form.jobTier === "skilled" && form.industry === "Internship") ||
     (form.jobTier === "unskilled" && form.unskilledJobType === "Internship")
@@ -59,10 +65,25 @@ export function isInternship(form: { jobTier: JobTier; industry: string; unskill
 /** Step order depends on tier and whether Internship is selected (education → resume → docs/photo for internship). */
 export function getStepOrder(form: ApplicationFormState): StepKey[] {
   if (!form.jobTier) return ["tier"];
+  if (form.jobTier === "internship") return ["tier", "internshipBranch"];
+
   const intern = isInternship(form);
+  const fromInternshipCard = form.internshipFromHome === true;
 
   if (form.jobTier === "skilled") {
     if (intern) {
+      if (fromInternshipCard) {
+        return [
+          "tier",
+          "internshipBranch",
+          "education",
+          "skillsExp",
+          "resumeOnly",
+          "internshipDocs",
+          "basicSkilled",
+          "review",
+        ];
+      }
       return [
         "tier",
         "industry",
@@ -79,6 +100,17 @@ export function getStepOrder(form: ApplicationFormState): StepKey[] {
 
   if (form.jobTier === "unskilled") {
     if (intern) {
+      if (fromInternshipCard) {
+        return [
+          "tier",
+          "internshipBranch",
+          "education",
+          "resumeOnly",
+          "internshipDocs",
+          "basicUnskilled",
+          "review",
+        ];
+      }
       return ["tier", "unskilledRole", "education", "resumeOnly", "internshipDocs", "basicUnskilled", "review"];
     }
     return ["tier", "unskilledRole", "basicUnskilled", "photoUnskilled", "review"];
@@ -89,6 +121,8 @@ export function getStepOrder(form: ApplicationFormState): StepKey[] {
 
 export interface ApplicationFormState {
   jobTier: JobTier;
+  /** True when user picked Internship on the first screen, then chose skilled vs entry-level (skips industry/job-type steps). */
+  internshipFromHome: boolean;
   industry: string;
   /** Free-form skills text (typed normally, not tag chips). */
   skills: string;
@@ -111,6 +145,7 @@ export interface ApplicationFormState {
 
 export const initialApplicationState: ApplicationFormState = {
   jobTier: "",
+  internshipFromHome: false,
   industry: "",
   skills: "",
   experience: "",

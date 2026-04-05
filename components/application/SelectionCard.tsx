@@ -1,14 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { HiOutlineAcademicCap, HiOutlineWrenchScrewdriver } from "react-icons/hi2";
+import { HiOutlineAcademicCap, HiOutlineBriefcase, HiOutlineWrenchScrewdriver } from "react-icons/hi2";
 
 type SelectionCardProps = {
   title: string;
   examples: string;
   selected: boolean;
   onClick: () => void;
-  variant: "skilled" | "unskilled";
+  variant: "skilled" | "unskilled" | "internship";
 };
 
 export default function SelectionCard({
@@ -18,7 +18,12 @@ export default function SelectionCard({
   onClick,
   variant,
 }: SelectionCardProps) {
-  const Icon = variant === "skilled" ? HiOutlineAcademicCap : HiOutlineWrenchScrewdriver;
+  const Icon =
+    variant === "skilled"
+      ? HiOutlineAcademicCap
+      : variant === "internship"
+        ? HiOutlineBriefcase
+        : HiOutlineWrenchScrewdriver;
 
   return (
     <motion.button

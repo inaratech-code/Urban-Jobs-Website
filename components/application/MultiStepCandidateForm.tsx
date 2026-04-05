@@ -91,6 +91,7 @@ function toCandidateFormData(f: ApplicationFormState): CandidateFormData {
 
 const stepLabel: Record<StepKey, string> = {
   tier: "Job type",
+  internshipBranch: "Internship type",
   industry: "Industry",
   education: "Education",
   skillsExp: "Skills & experience",
@@ -121,8 +122,36 @@ export default function MultiStepCandidateForm({ applyJobId }: MultiStepCandidat
 
   const order = useMemo(
     () => getStepOrder(form),
-    [form.jobTier, form.industry, form.unskilledJobType]
+    [form.jobTier, form.industry, form.unskilledJobType, form.internshipFromHome]
   );
+
+  const goToInternshipEducation = useCallback((tier: "skilled" | "unskilled") => {
+    setForm((prev) => {
+      const next: ApplicationFormState =
+        tier === "skilled"
+          ? {
+              ...prev,
+              jobTier: "skilled",
+              industry: "Internship",
+              internshipFromHome: true,
+            }
+          : {
+              ...prev,
+              jobTier: "unskilled",
+              unskilledJobType: "Internship",
+              internshipFromHome: true,
+            };
+      const ord = getStepOrder(next);
+      const idx = ord.indexOf("education");
+      queueMicrotask(() => {
+        setStepIndex(idx >= 0 ? idx : 1);
+        setDirection(1);
+      });
+      return next;
+    });
+    setErrors({});
+    setSubmitError(null);
+  }, []);
 
   useEffect(() => {
     setStepIndex((i) => Math.min(i, Math.max(0, order.length - 1)));
@@ -147,7 +176,9 @@ export default function MultiStepCandidateForm({ applyJobId }: MultiStepCandidat
       const e: Record<string, string> = {};
       switch (key) {
         case "tier":
-          if (!form.jobTier) e.jobTier = "Choose Skilled or Unskilled to continue";
+          if (!form.jobTier) e.jobTier = "Choose Skilled, Unskilled, or Internship to continue";
+          break;
+        case "internshipBranch":
           break;
         case "industry":
           if (!form.industry) e.industry = "Select an industry";
@@ -200,6 +231,7 @@ export default function MultiStepCandidateForm({ applyJobId }: MultiStepCandidat
   );
 
   const goNext = () => {
+    if (currentKey === "internshipBranch") return;
     if (!validate(currentKey)) return;
     if (currentKey === "review") {
       handleSubmit();
@@ -366,25 +398,71 @@ export default function MultiStepCandidateForm({ applyJobId }: MultiStepCandidat
                 title="What kind of work are you looking for?"
                 subtitle="Choose one — we’ll tailor the next questions for you."
               >
-                <div className="grid sm:grid-cols-2 gap-4">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <SelectionCard
                     variant="skilled"
                     title="Skilled jobs"
                     examples="Examples: IT, Accounting, Teaching, Legal"
                     selected={form.jobTier === "skilled"}
-                    onClick={() => update("jobTier", "skilled")}
+                    onClick={() => {
+                      setForm((prev) => ({ ...prev, jobTier: "skilled", internshipFromHome: false }));
+                      setErrors((e) => ({ ...e, jobTier: "" }));
+                      setSubmitError(null);
+                    }}
                   />
                   <SelectionCard
                     variant="unskilled"
                     title="Unskilled jobs"
                     examples="Examples: Helper, Reception, Hotel staff"
                     selected={form.jobTier === "unskilled"}
-                    onClick={() => update("jobTier", "unskilled")}
+                    onClick={() => {
+                      setForm((prev) => ({ ...prev, jobTier: "unskilled", internshipFromHome: false }));
+                      setErrors((e) => ({ ...e, jobTier: "" }));
+                      setSubmitError(null);
+                    }}
+                  />
+                  <SelectionCard
+                    variant="internship"
+                    title="Internship"
+                    examples="Education, resume, then documents & photo — professional or entry-level."
+                    selected={form.jobTier === "internship"}
+                    onClick={() => {
+                      setForm((prev) => ({ ...prev, jobTier: "internship", internshipFromHome: false }));
+                      setErrors((e) => ({ ...e, jobTier: "" }));
+                      setSubmitError(null);
+                    }}
                   />
                 </div>
                 {errors.jobTier && (
                   <p className="text-sm font-medium text-red-600 text-center">{errors.jobTier}</p>
                 )}
+              </StepContainer>
+            )}
+
+            {currentKey === "internshipBranch" && (
+              <StepContainer
+                title="What kind of internship?"
+                subtitle="Professional internships usually need a degree track; entry-level includes on-the-job training."
+              >
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <SelectionCard
+                    variant="skilled"
+                    title="Skilled / professional internship"
+                    examples="Degree-related, office, technical — resume & skills step included."
+                    selected={false}
+                    onClick={() => goToInternshipEducation("skilled")}
+                  />
+                  <SelectionCard
+                    variant="unskilled"
+                    title="Entry-level internship"
+                    examples="Helper, trainee, starter roles — same uploads, simpler path."
+                    selected={false}
+                    onClick={() => goToInternshipEducation("unskilled")}
+                  />
+                </div>
+                <p className="text-xs text-slate-500 text-center mt-4">
+                  Tap a card to continue — or Back to change your first answer.
+                </p>
               </StepContainer>
             )}
 
@@ -792,6 +870,7 @@ export default function MultiStepCandidateForm({ applyJobId }: MultiStepCandidat
           showBack={stepIndex > 0}
           onBack={goBack}
           onNext={goNext}
+          showNext={currentKey !== "internshipBranch"}
           isLastStep={currentKey === "review"}
           loading={loading}
         />
