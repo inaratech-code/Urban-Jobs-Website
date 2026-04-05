@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  getCloudinaryUploadConfig,
+  cloudinaryConfigErrorMessage,
+} from "@/lib/cloudinary-config";
 
 const MAX_BYTES = 15 * 1024 * 1024; // 15 MB
 
 export async function POST(req: NextRequest) {
-  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-  const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
-
-  if (!cloudName || !uploadPreset) {
-    return NextResponse.json(
-      { error: "Cloudinary is not configured on the server." },
-      { status: 500 }
-    );
+  const cfg = getCloudinaryUploadConfig();
+  if (!cfg) {
+    return NextResponse.json({ error: cloudinaryConfigErrorMessage() }, { status: 500 });
   }
+  const { cloudName, uploadPreset } = cfg;
 
   let formData: FormData;
   try {

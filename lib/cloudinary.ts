@@ -1,3 +1,5 @@
+import { getCloudinaryUploadConfig, cloudinaryConfigErrorMessage } from "./cloudinary-config";
+
 export async function uploadToCloudinary(
   file: File,
   folder = "urban-jobs/candidates"
@@ -20,14 +22,11 @@ export async function uploadToCloudinary(
     return json.url;
   }
 
-  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-  const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
-
-  if (!cloudName || !uploadPreset) {
-    throw new Error(
-      "Cloudinary is not configured. Set NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME and NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET."
-    );
+  const cfg = getCloudinaryUploadConfig();
+  if (!cfg) {
+    throw new Error(cloudinaryConfigErrorMessage());
   }
+  const { cloudName, uploadPreset } = cfg;
 
   const formData = new FormData();
   formData.append("file", file);
