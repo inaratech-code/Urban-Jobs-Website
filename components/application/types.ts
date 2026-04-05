@@ -9,6 +9,7 @@ export type ExperienceValue = (typeof EXPERIENCE_OPTIONS)[number]["value"];
 export type JobTier = "" | "skilled" | "unskilled";
 
 export const SKILLED_INDUSTRIES = [
+  "Internship",
   "IT",
   "Education",
   "Hotel Management",
@@ -17,6 +18,7 @@ export const SKILLED_INDUSTRIES = [
 ] as const;
 
 export const UNSKILLED_JOB_TYPES = [
+  "Internship",
   "Hotel Staff",
   "Cleaner",
   "Helper",
@@ -24,23 +26,65 @@ export const UNSKILLED_JOB_TYPES = [
   "Office Boy",
 ] as const;
 
+export const EDUCATION_LEVEL_OPTIONS = [
+  { value: "SEE / Grade 10", label: "SEE / Grade 10" },
+  { value: "+2 / High school", label: "+2 / High school" },
+  { value: "Diploma", label: "Diploma" },
+  { value: "Bachelor's degree", label: "Bachelor's degree" },
+  { value: "Master's degree", label: "Master's degree" },
+  { value: "Other", label: "Other" },
+] as const;
+
 export type StepKey =
   | "tier"
   | "industry"
+  | "education"
   | "skillsExp"
   | "resumeCerts"
+  | "resumeOnly"
+  | "internshipDocs"
   | "basicSkilled"
   | "unskilledRole"
   | "basicUnskilled"
   | "photoUnskilled"
   | "review";
 
-export function getStepOrder(tier: JobTier): StepKey[] {
-  if (!tier) return ["tier"];
-  if (tier === "skilled") {
+export function isInternship(form: { jobTier: JobTier; industry: string; unskilledJobType: string }): boolean {
+  return (
+    (form.jobTier === "skilled" && form.industry === "Internship") ||
+    (form.jobTier === "unskilled" && form.unskilledJobType === "Internship")
+  );
+}
+
+/** Step order depends on tier and whether Internship is selected (education → resume → docs/photo for internship). */
+export function getStepOrder(form: ApplicationFormState): StepKey[] {
+  if (!form.jobTier) return ["tier"];
+  const intern = isInternship(form);
+
+  if (form.jobTier === "skilled") {
+    if (intern) {
+      return [
+        "tier",
+        "industry",
+        "education",
+        "skillsExp",
+        "resumeOnly",
+        "internshipDocs",
+        "basicSkilled",
+        "review",
+      ];
+    }
     return ["tier", "industry", "skillsExp", "resumeCerts", "basicSkilled", "review"];
   }
-  return ["tier", "unskilledRole", "basicUnskilled", "photoUnskilled", "review"];
+
+  if (form.jobTier === "unskilled") {
+    if (intern) {
+      return ["tier", "unskilledRole", "education", "resumeOnly", "internshipDocs", "basicUnskilled", "review"];
+    }
+    return ["tier", "unskilledRole", "basicUnskilled", "photoUnskilled", "review"];
+  }
+
+  return ["tier"];
 }
 
 export interface ApplicationFormState {
@@ -57,6 +101,12 @@ export interface ApplicationFormState {
   email: string;
   city: string;
   photoFile: File | null;
+  /** Highest completed or in-progress level (e.g. Bachelor's). */
+  educationLevel: string;
+  educationInstitution: string;
+  educationField: string;
+  /** Graduation year or expected (e.g. 2026). */
+  educationYear: string;
 }
 
 export const initialApplicationState: ApplicationFormState = {
@@ -72,4 +122,8 @@ export const initialApplicationState: ApplicationFormState = {
   email: "",
   city: "Dhangadhi",
   photoFile: null,
+  educationLevel: "",
+  educationInstitution: "",
+  educationField: "",
+  educationYear: "",
 };

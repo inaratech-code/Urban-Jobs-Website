@@ -14,9 +14,11 @@ import SkillsTagInput from "./SkillsTagInput";
 import SelectionCard from "./SelectionCard";
 import {
   ApplicationFormState,
+  EDUCATION_LEVEL_OPTIONS,
   EXPERIENCE_OPTIONS,
   getStepOrder,
   initialApplicationState,
+  isInternship,
   SKILLED_INDUSTRIES,
   StepKey,
   UNSKILLED_JOB_TYPES,
@@ -41,6 +43,16 @@ function withTimeout<T>(promise: Promise<T>, ms = 120000): Promise<T> {
   });
 }
 
+function formatEducation(f: ApplicationFormState): string {
+  const parts = [
+    f.educationLevel,
+    f.educationField.trim(),
+    f.educationInstitution.trim(),
+    f.educationYear.trim(),
+  ].filter(Boolean);
+  return parts.length ? parts.join(" · ") : "—";
+}
+
 function toCandidateFormData(f: ApplicationFormState): CandidateFormData {
   if (f.jobTier === "skilled") {
     return {
@@ -52,7 +64,7 @@ function toCandidateFormData(f: ApplicationFormState): CandidateFormData {
       permanentAddress: "",
       industryCategory: f.industry,
       desiredRole: "Skilled — " + f.industry,
-      education: "See resume",
+      education: isInternship(f) ? formatEducation(f) : "See resume",
       skills: f.skills.trim(),
       experience: f.experience,
       preferredJob: f.industry,
@@ -70,9 +82,9 @@ function toCandidateFormData(f: ApplicationFormState): CandidateFormData {
     permanentAddress: "",
     industryCategory: "Unskilled",
     desiredRole: f.unskilledJobType,
-    education: "—",
+    education: isInternship(f) ? formatEducation(f) : "—",
     skills: f.unskilledJobType,
-    experience: "General / entry",
+    experience: isInternship(f) && f.experience ? f.experience : "General / entry",
     preferredJob: f.unskilledJobType,
   };
 }
@@ -80,8 +92,11 @@ function toCandidateFormData(f: ApplicationFormState): CandidateFormData {
 const stepLabel: Record<StepKey, string> = {
   tier: "Job type",
   industry: "Industry",
+  education: "Education",
   skillsExp: "Skills & experience",
   resumeCerts: "Resume & certificates",
+  resumeOnly: "Resume",
+  internshipDocs: "Documents & photo",
   basicSkilled: "Your details",
   unskilledRole: "Role",
   basicUnskilled: "Your details",
@@ -104,7 +119,14 @@ export default function MultiStepCandidateForm({ applyJobId }: MultiStepCandidat
 
   const focusRef = useRef<HTMLInputElement | HTMLSelectElement | null>(null);
 
-  const order = useMemo(() => getStepOrder(form.jobTier), [form.jobTier]);
+  const order = useMemo(
+    () => getStepOrder(form),
+    [form.jobTier, form.industry, form.unskilledJobType]
+  );
+
+  useEffect(() => {
+    setStepIndex((i) => Math.min(i, Math.max(0, order.length - 1)));
+  }, [order.length, form.jobTier, form.industry, form.unskilledJobType]);
   const currentKey = order[stepIndex] ?? "tier";
   const totalSteps = order.length;
   const displayStep = stepIndex + 1;
@@ -130,12 +152,24 @@ export default function MultiStepCandidateForm({ applyJobId }: MultiStepCandidat
         case "industry":
           if (!form.industry) e.industry = "Select an industry";
           break;
+        case "education":
+          if (!form.educationLevel) e.educationLevel = "Select education level";
+          if (!form.educationInstitution.trim()) e.educationInstitution = "Enter institution name";
+          if (!form.educationField.trim()) e.educationField = "Enter field of study (e.g. BBA, CS)";
+          if (!form.educationYear.trim()) e.educationYear = "Enter graduation or expected year";
+          break;
         case "skillsExp":
           if (!form.skills.trim()) e.skills = "Enter your skills";
           if (!form.experience) e.experience = "Select experience level";
           break;
         case "resumeCerts":
           if (!form.resumeFile) e.resumeFile = "Upload your resume";
+          break;
+        case "resumeOnly":
+          if (!form.resumeFile) e.resumeFile = "Upload your resume";
+          break;
+        case "internshipDocs":
+          if (!form.photoFile) e.photoFile = "Upload a profile photo";
           break;
         case "basicSkilled":
           if (!form.fullName.trim()) e.fullName = "Enter your full name";
@@ -195,24 +229,32 @@ export default function MultiStepCandidateForm({ applyJobId }: MultiStepCandidat
   };
 
   const handleSubmit = async () => {
-    if (form.jobTier === "skilled") {
+    const intern = isInternship(form);
+    if (form.jobTier === "skilled" || intern) {
       if (!form.resumeFile) {
         setSubmitError("Resume is required.");
         return;
       }
     }
+    if (intern && !form.photoFile) {
+      setSubmitError("Profile photo is required.");
+      return;
+    }
     setLoading(true);
     setSubmitError(null);
     try {
       const data = toCandidateFormData(form);
+      const intern = isInternship(form);
       const id = await withTimeout(
         createCandidate(
           data,
-          form.jobTier === "skilled" ? form.resumeFile : null,
-          form.jobTier === "unskilled" ? form.photoFile : null,
-          form.jobTier === "skilled" && form.certificateFiles.length ? form.certificateFiles : undefined,
+          form.jobTier === "skilled" || intern ? form.resumeFile : null,
+          intern ? form.photoFile : form.jobTier === "unskilled" ? form.photoFile : null,
+          (form.jobTier === "skilled" || intern) && form.certificateFiles.length
+            ? form.certificateFiles
+            : undefined,
           {
-            allowEmptyDocuments: form.jobTier === "unskilled" && !form.photoFile,
+            allowEmptyDocuments: form.jobTier === "unskilled" && !intern && !form.photoFile,
           }
         )
       );
@@ -347,7 +389,7 @@ export default function MultiStepCandidateForm({ applyJobId }: MultiStepCandidat
             )}
 
             {currentKey === "industry" && (
-              <StepContainer title="Industry" subtitle="Where does your experience fit best?">
+              <StepContainer title="Industry" subtitle="Where does your experience fit best? Includes Internship.">
                 <FormDropdown
                   ref={focusRef as React.Ref<HTMLSelectElement>}
                   id="industry"
@@ -358,6 +400,50 @@ export default function MultiStepCandidateForm({ applyJobId }: MultiStepCandidat
                   value={form.industry}
                   onChange={(v) => update("industry", v)}
                   error={errors.industry}
+                />
+              </StepContainer>
+            )}
+
+            {currentKey === "education" && (
+              <StepContainer
+                title="Education"
+                subtitle="Basic details and level — select Bachelor's degree if your program is at that level."
+              >
+                <FormDropdown
+                  ref={focusRef as React.Ref<HTMLSelectElement>}
+                  id="educationLevel"
+                  label="Education level"
+                  required
+                  placeholder="Select level"
+                  options={[...EDUCATION_LEVEL_OPTIONS]}
+                  value={form.educationLevel}
+                  onChange={(v) => update("educationLevel", v)}
+                  error={errors.educationLevel}
+                />
+                <FormInput
+                  id="educationInstitution"
+                  label="School / College / University"
+                  required
+                  value={form.educationInstitution}
+                  onChange={(e) => update("educationInstitution", e.target.value)}
+                  error={errors.educationInstitution}
+                />
+                <FormInput
+                  id="educationField"
+                  label="Field of study"
+                  required
+                  hint="e.g. BBA, Computer Science, Civil Engineering"
+                  value={form.educationField}
+                  onChange={(e) => update("educationField", e.target.value)}
+                  error={errors.educationField}
+                />
+                <FormInput
+                  id="educationYear"
+                  label="Graduation year or expected"
+                  required
+                  value={form.educationYear}
+                  onChange={(e) => update("educationYear", e.target.value)}
+                  error={errors.educationYear}
                 />
               </StepContainer>
             )}
@@ -409,6 +495,49 @@ export default function MultiStepCandidateForm({ applyJobId }: MultiStepCandidat
               </StepContainer>
             )}
 
+            {currentKey === "resumeOnly" && (
+              <StepContainer
+                title="Resume"
+                subtitle="Upload your CV (PDF, Word, or image). Next step: supporting documents and photo."
+              >
+                <FileUploader
+                  id="resume-intern"
+                  label="Resume"
+                  required
+                  accept=".pdf,.doc,.docx,image/*"
+                  value={form.resumeFile}
+                  onChange={(f) => update("resumeFile", f as File | null)}
+                  error={errors.resumeFile}
+                />
+              </StepContainer>
+            )}
+
+            {currentKey === "internshipDocs" && (
+              <StepContainer
+                title="Documents & photo"
+                subtitle="Optional certificates, then a clear profile photo for your application."
+              >
+                <FileUploader
+                  id="certs-intern"
+                  label="Certificates or other documents (optional)"
+                  description="Multiple files allowed."
+                  accept=".pdf,.doc,.docx,image/*"
+                  multiple
+                  value={form.certificateFiles.length ? form.certificateFiles : null}
+                  onChange={(f) => update("certificateFiles", Array.isArray(f) ? f : f ? [f] : [])}
+                />
+                <FileUploader
+                  id="photo-intern"
+                  label="Profile photo"
+                  required
+                  accept="image/*"
+                  value={form.photoFile}
+                  onChange={(f) => update("photoFile", f as File | null)}
+                  error={errors.photoFile}
+                />
+              </StepContainer>
+            )}
+
             {currentKey === "basicSkilled" && (
               <StepContainer title="Your contact details" subtitle="We’ll use this to reach you about opportunities.">
                 <FormInput
@@ -454,7 +583,7 @@ export default function MultiStepCandidateForm({ applyJobId }: MultiStepCandidat
             )}
 
             {currentKey === "unskilledRole" && (
-              <StepContainer title="Job type" subtitle="Which role matches what you’re looking for?">
+              <StepContainer title="Job type" subtitle="Which role matches what you’re looking for? Includes Internship.">
                 <FormDropdown
                   ref={focusRef as React.Ref<HTMLSelectElement>}
                   id="unskilledJobType"
@@ -540,13 +669,21 @@ export default function MultiStepCandidateForm({ applyJobId }: MultiStepCandidat
                         <dt className="text-slate-500">Industry</dt>
                         <dd className="font-medium text-slate-900 text-right">{form.industry}</dd>
                       </div>
+                      {isInternship(form) && (
+                        <div className="flex flex-col gap-1">
+                          <dt className="text-slate-500">Education</dt>
+                          <dd className="font-medium text-slate-900 text-right whitespace-pre-wrap">
+                            {formatEducation(form)}
+                          </dd>
+                        </div>
+                      )}
                       <div className="flex flex-col gap-1">
                         <dt className="text-slate-500">Skills</dt>
                         <dd className="font-medium text-slate-900 whitespace-pre-wrap">{form.skills.trim() || "—"}</dd>
                       </div>
                       <div className="flex justify-between gap-3">
                         <dt className="text-slate-500">Experience</dt>
-                        <dd className="font-medium text-slate-900">{form.experience}</dd>
+                        <dd className="font-medium text-slate-900">{form.experience || "—"}</dd>
                       </div>
                       <div className="flex justify-between gap-3">
                         <dt className="text-slate-500">Resume</dt>
@@ -562,6 +699,14 @@ export default function MultiStepCandidateForm({ applyJobId }: MultiStepCandidat
                             : "None"}
                         </dd>
                       </div>
+                      {isInternship(form) && (
+                        <div className="flex justify-between gap-3">
+                          <dt className="text-slate-500">Profile photo</dt>
+                          <dd className="font-medium text-slate-900 truncate max-w-[55%] text-right">
+                            {form.photoFile?.name ?? "—"}
+                          </dd>
+                        </div>
+                      )}
                     </>
                   )}
                   {form.jobTier === "unskilled" && (
@@ -570,12 +715,44 @@ export default function MultiStepCandidateForm({ applyJobId }: MultiStepCandidat
                         <dt className="text-slate-500">Job type</dt>
                         <dd className="font-medium text-slate-900 text-right">{form.unskilledJobType}</dd>
                       </div>
-                      <div className="flex justify-between gap-3">
-                        <dt className="text-slate-500">Photo</dt>
-                        <dd className="font-medium text-slate-900 text-right">
-                          {form.photoFile?.name ?? "Skipped"}
-                        </dd>
-                      </div>
+                      {isInternship(form) && (
+                        <>
+                          <div className="flex flex-col gap-1">
+                            <dt className="text-slate-500">Education</dt>
+                            <dd className="font-medium text-slate-900 text-right whitespace-pre-wrap">
+                              {formatEducation(form)}
+                            </dd>
+                          </div>
+                          <div className="flex justify-between gap-3">
+                            <dt className="text-slate-500">Resume</dt>
+                            <dd className="font-medium text-slate-900 truncate max-w-[55%] text-right">
+                              {form.resumeFile?.name ?? "—"}
+                            </dd>
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <dt className="text-slate-500">Certificates / documents</dt>
+                            <dd className="font-medium text-slate-900">
+                              {form.certificateFiles.length
+                                ? form.certificateFiles.map((x) => x.name).join(", ")
+                                : "None"}
+                            </dd>
+                          </div>
+                          <div className="flex justify-between gap-3">
+                            <dt className="text-slate-500">Profile photo</dt>
+                            <dd className="font-medium text-slate-900 text-right">
+                              {form.photoFile?.name ?? "—"}
+                            </dd>
+                          </div>
+                        </>
+                      )}
+                      {!isInternship(form) && (
+                        <div className="flex justify-between gap-3">
+                          <dt className="text-slate-500">Photo</dt>
+                          <dd className="font-medium text-slate-900 text-right">
+                            {form.photoFile?.name ?? "Skipped"}
+                          </dd>
+                        </div>
+                      )}
                     </>
                   )}
                   <div className="border-t border-slate-200 pt-3 mt-3 space-y-2">
