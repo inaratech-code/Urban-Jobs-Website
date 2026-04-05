@@ -152,6 +152,26 @@ export default function MultiStepCandidateForm({ applyJobId }: MultiStepCandidat
     setSubmitError(null);
   }, []);
 
+  /** After Skilled / Unskilled card tap — advance to Industry or Role without pressing Next. */
+  const goAfterTierSkilledOrUnskilled = useCallback((tier: "skilled" | "unskilled") => {
+    setForm((prev) => {
+      const next: ApplicationFormState =
+        tier === "skilled"
+          ? { ...prev, jobTier: "skilled", internshipFromHome: false }
+          : { ...prev, jobTier: "unskilled", internshipFromHome: false };
+      const ord = getStepOrder(next);
+      const nextStepKey: StepKey = tier === "skilled" ? "industry" : "unskilledRole";
+      const idx = ord.indexOf(nextStepKey);
+      queueMicrotask(() => {
+        setStepIndex(idx >= 0 ? idx : 1);
+        setDirection(1);
+      });
+      return next;
+    });
+    setErrors((e) => ({ ...e, jobTier: "" }));
+    setSubmitError(null);
+  }, []);
+
   useEffect(() => {
     setStepIndex((i) => Math.min(i, Math.max(0, order.length - 1)));
   }, [order.length, form.jobTier, form.industry, form.unskilledJobType, form.internshipFromHome]);
@@ -401,22 +421,14 @@ export default function MultiStepCandidateForm({ applyJobId }: MultiStepCandidat
                     title="Skilled jobs"
                     examples="Examples: IT, Accounting, Teaching, Legal"
                     selected={form.jobTier === "skilled" && !form.internshipFromHome}
-                    onClick={() => {
-                      setForm((prev) => ({ ...prev, jobTier: "skilled", internshipFromHome: false }));
-                      setErrors((e) => ({ ...e, jobTier: "" }));
-                      setSubmitError(null);
-                    }}
+                    onClick={() => goAfterTierSkilledOrUnskilled("skilled")}
                   />
                   <SelectionCard
                     variant="unskilled"
                     title="Unskilled jobs"
                     examples="Examples: Helper, Reception, Hotel staff"
                     selected={form.jobTier === "unskilled" && !form.internshipFromHome}
-                    onClick={() => {
-                      setForm((prev) => ({ ...prev, jobTier: "unskilled", internshipFromHome: false }));
-                      setErrors((e) => ({ ...e, jobTier: "" }));
-                      setSubmitError(null);
-                    }}
+                    onClick={() => goAfterTierSkilledOrUnskilled("unskilled")}
                   />
                   <SelectionCard
                     variant="internship"
@@ -836,6 +848,7 @@ export default function MultiStepCandidateForm({ applyJobId }: MultiStepCandidat
           showBack={stepIndex > 0}
           onBack={goBack}
           onNext={goNext}
+          showNext={currentKey !== "tier"}
           isLastStep={currentKey === "review"}
           loading={loading}
         />
