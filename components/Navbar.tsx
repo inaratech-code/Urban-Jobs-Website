@@ -33,9 +33,8 @@ export default function Navbar() {
             </span>
           </Link>
 
-          <div className="hidden lg:flex" />
-
-          <div className="hidden md:flex items-center gap-2 shrink-0">
+          {/* Center CTAs on md+ */}
+          <div className="hidden md:flex flex-1 items-center justify-center gap-2">
             <Link
               href="/candidate"
               className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-cta-job hover:bg-cta-job-hover transition-colors shadow-sm"
@@ -48,9 +47,13 @@ export default function Navbar() {
             >
               Hire now
             </Link>
+          </div>
+
+          {/* Right-side actions on md+ */}
+          <div className="hidden md:flex items-center shrink-0">
             <Link
               href="/admin"
-              className="ml-1 p-2 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+              className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-700"
               title="Admin"
             >
               <HiOutlineBuildingOffice2 className="h-5 w-5" />
