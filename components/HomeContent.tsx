@@ -200,10 +200,10 @@ export default function HomeContent({
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto">
               <h2 className="font-display text-2xl sm:text-3xl font-bold text-slate-900">
-                Jobs overview
+                Jobs stats
               </h2>
               <p className="mt-2 text-slate-600">
-                Live platform stats (demo numbers) — updated as new jobs are posted and filled.
+                Demo numbers for the homepage — hiring, hired, and total jobs posted.
               </p>
             </div>
 
@@ -216,13 +216,13 @@ export default function HomeContent({
                   img: "/stats-total.svg",
                 },
                 {
-                  title: "Hiring now",
+                  title: "How many hiring",
                   value: String(FAKE_STATS.hiring),
                   sub: "Companies actively receiving applications",
                   img: "/stats-hiring.svg",
                 },
                 {
-                  title: "Hired",
+                  title: "How many hired",
                   value: String(FAKE_STATS.hired),
                   sub: "Candidates placed via Urban Jobs",
                   img: "/stats-hired.svg",
@@ -251,12 +251,6 @@ export default function HomeContent({
             </p>
 
             <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link
-                href="/jobs"
-                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-primary text-white font-semibold shadow-md hover:opacity-95 transition-opacity w-full sm:w-auto"
-              >
-                Browse all jobs
-              </Link>
               <Link
                 href="/job-request"
                 className="text-sm font-semibold text-primary hover:underline"
