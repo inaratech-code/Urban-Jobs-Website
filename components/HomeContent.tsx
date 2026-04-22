@@ -228,7 +228,7 @@ export default function HomeContent({
                 <p className="mt-2 text-slate-600 text-center max-w-xl mx-auto">
                   For job seekers — build your profile and get discovered by local employers.
                 </p>
-                <div className="mt-10 grid md:grid-cols-2 gap-6 max-w-5xl mx-auto lg:max-w-none">
+                <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto lg:max-w-none">
                   {CANDIDATE_STEPS.map((step, i) => (
                     <motion.div
                       key={step.title}
@@ -247,7 +247,7 @@ export default function HomeContent({
                     </motion.div>
                   ))}
                 </div>
-                <div className="mt-10 text-center">
+                <div className="mt-8 text-center">
                   <Link
                     href="/candidate"
                     className="inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold text-white bg-cta-job hover:bg-cta-job-hover transition-colors"
@@ -271,7 +271,7 @@ export default function HomeContent({
                     Post a new job
                   </Link>
                 </div>
-                <div className="mt-10 grid md:grid-cols-2 gap-6">
+                <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {EMPLOYER_STEPS.map((step, i) => (
                     <div
                       key={step.title}
