@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { HiOutlineBuildingOffice2 } from "react-icons/hi2";
 import { useState } from "react";
 import BrandLogo from "@/components/BrandLogo";
 
@@ -46,6 +47,13 @@ export default function Navbar() {
               className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-cta-hire hover:bg-cta-hire-hover transition-colors shadow-sm"
             >
               Hire now
+            </Link>
+            <Link
+              href="/admin"
+              className="ml-1 p-2 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+              title="Admin"
+            >
+              <HiOutlineBuildingOffice2 className="h-5 w-5" />
             </Link>
           </div>
 
@@ -105,6 +113,14 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
+            <Link
+              href="/admin"
+              onClick={() => setMobileOpen(false)}
+              className="flex items-center gap-2 px-4 py-2.5 text-slate-600"
+            >
+              <HiOutlineBuildingOffice2 className="h-4 w-4" />
+              Admin
+            </Link>
           </motion.div>
         )}
       </nav>
