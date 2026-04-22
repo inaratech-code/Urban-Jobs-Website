@@ -270,7 +270,7 @@ export default function HomeContent({
             <p className="mt-2 text-slate-600 text-center max-w-xl mx-auto">
               For job seekers — build your profile and get discovered by local employers.
             </p>
-            <div className="mt-10 grid md:grid-cols-3 gap-6">
+            <div className="mt-10 grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
               {CANDIDATE_STEPS.map((step, i) => (
                 <motion.div
                   key={step.title}
