@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { HiOutlineBuildingOffice2 } from "react-icons/hi2";
 import { useState } from "react";
@@ -12,10 +11,7 @@ const moreLinks = [
 ];
 
 export default function Navbar() {
-  const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const hiringActive =
-    pathname === "/employer" || pathname.startsWith("/employer");
 
   return (
     <motion.header
@@ -37,37 +33,9 @@ export default function Navbar() {
             </span>
           </Link>
 
-          {/* WorkIndia-style audience switcher — desktop */}
-          <div className="hidden lg:flex items-center rounded-full bg-slate-100 p-1 border border-slate-200/80">
-            <Link
-              href="/jobs"
-              className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
-                !hiringActive
-                  ? "bg-white text-slate-900 shadow-sm"
-                  : "text-slate-600 hover:text-slate-900"
-              }`}
-            >
-              Browse jobs
-            </Link>
-            <Link
-              href="/employer"
-              className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
-                hiringActive
-                  ? "bg-white text-slate-900 shadow-sm"
-                  : "text-slate-600 hover:text-slate-900"
-              }`}
-            >
-              Hiring
-            </Link>
-          </div>
+          <div className="hidden lg:flex" />
 
           <div className="hidden md:flex items-center gap-2 shrink-0">
-            <Link
-              href="/jobs"
-              className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-colors shadow-sm"
-            >
-              Browse jobs
-            </Link>
             <Link
               href="/candidate"
               className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-cta-job hover:bg-cta-job-hover transition-colors shadow-sm"
@@ -121,26 +89,6 @@ export default function Navbar() {
             animate={{ opacity: 1, height: "auto" }}
             className="md:hidden border-t border-slate-100 py-4 space-y-3"
           >
-            <div className="flex rounded-xl bg-slate-100 p-1">
-              <Link
-                href="/jobs"
-                onClick={() => setMobileOpen(false)}
-                className={`flex-1 text-center py-2.5 rounded-lg text-sm font-semibold ${
-                  !hiringActive ? "bg-white shadow-sm text-slate-900" : "text-slate-600"
-                }`}
-              >
-                Browse jobs
-              </Link>
-              <Link
-                href="/employer"
-                onClick={() => setMobileOpen(false)}
-                className={`flex-1 text-center py-2.5 rounded-lg text-sm font-semibold ${
-                  hiringActive ? "bg-white shadow-sm text-slate-900" : "text-slate-600"
-                }`}
-              >
-                Hiring
-              </Link>
-            </div>
             <Link
               href="/candidate"
               onClick={() => setMobileOpen(false)}
