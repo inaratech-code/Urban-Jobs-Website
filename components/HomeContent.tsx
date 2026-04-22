@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -70,6 +71,11 @@ export default function HomeContent({
   totalJobs,
 }: HomeContentProps) {
   const categoryCount = categorySummaries.length;
+  const FAKE_STATS = {
+    totalPosted: 1248,
+    hiring: 86,
+    hired: 392,
+  } as const;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -189,37 +195,56 @@ export default function HomeContent({
           </div>
         </section>
 
-        {/* Featured Jobs — category summary */}
+        {/* Jobs overview (KPIs) */}
         <section className="py-14 sm:py-16 bg-background">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center sm:text-left max-w-2xl sm:mx-0 mx-auto">
-              <h2 className="font-display text-2xl sm:text-3xl font-bold text-slate-900">Jobs by category</h2>
+            <div className="text-center max-w-2xl mx-auto">
+              <h2 className="font-display text-2xl sm:text-3xl font-bold text-slate-900">
+                Jobs overview
+              </h2>
               <p className="mt-2 text-slate-600">
-                {totalJobs > 0
-                  ? `${totalJobs} open role${totalJobs === 1 ? "" : "s"} across ${categoryCount || "several"} categories`
-                  : "New listings appear here when employers post roles."}
+                Live platform stats (demo numbers) — updated as new jobs are posted and filled.
               </p>
             </div>
 
-            <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {categorySummaries.length > 0 ? (
-                categorySummaries.map((row) => (
-                  <li
-                    key={row.label}
-                    className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3.5 shadow-sm hover:border-slate-300 transition-colors"
-                  >
-                    <span className="font-medium text-slate-800">{row.label}</span>
-                    <span className="text-sm font-semibold text-cta-job">
-                      {row.count} job{row.count === 1 ? "" : "s"}
-                    </span>
-                  </li>
-                ))
-              ) : (
-                <li className="col-span-full rounded-xl border border-dashed border-slate-300 bg-white px-4 py-10 text-center text-slate-500">
-                  No jobs posted yet. Check back soon!
-                </li>
-              )}
-            </ul>
+            <div className="mt-8 grid gap-4 sm:grid-cols-3 max-w-4xl mx-auto">
+              {[
+                {
+                  title: "Total jobs posted",
+                  value: String(FAKE_STATS.totalPosted),
+                  sub: totalJobs > 0 ? `${totalJobs} currently open` : `${categoryCount || 0} categories tracked`,
+                  img: "/stats-total.svg",
+                },
+                {
+                  title: "Hiring now",
+                  value: String(FAKE_STATS.hiring),
+                  sub: "Companies actively receiving applications",
+                  img: "/stats-hiring.svg",
+                },
+                {
+                  title: "Hired",
+                  value: String(FAKE_STATS.hired),
+                  sub: "Candidates placed via Urban Jobs",
+                  img: "/stats-hired.svg",
+                },
+              ].map((s) => (
+                <div
+                  key={s.title}
+                  className="rounded-2xl border border-slate-200 bg-white/80 backdrop-blur-sm shadow-sm p-5 sm:p-6 flex items-center gap-4"
+                >
+                  <div className="shrink-0 h-14 w-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center">
+                    <Image src={s.img} alt="" width={42} height={42} className="opacity-95" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">{s.title}</p>
+                    <p className="font-display text-2xl sm:text-3xl font-bold text-slate-900 leading-tight mt-0.5">
+                      {s.value}
+                    </p>
+                    <p className="text-xs text-slate-600 mt-1">{s.sub}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
 
             <p className="mt-8 text-center text-sm text-slate-600 max-w-xl mx-auto leading-relaxed">
               If your desired job is not available, please submit a request — we will contact you soon.
