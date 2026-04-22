@@ -11,19 +11,9 @@ import {
   HiOutlineUserPlus,
   HiOutlineDocumentDuplicate,
   HiOutlineBuildingOffice2,
-  HiOutlineMagnifyingGlass,
-  HiOutlineMapPin,
   HiOutlineCheckCircle,
   HiOutlineClipboardDocumentList,
 } from "react-icons/hi2";
-
-const CATEGORIES = [
-  { label: "Teaching Jobs", href: "/jobs?category=Teaching+Jobs" },
-  { label: "Hotel Management", href: "/jobs?category=Hotel+Management" },
-  { label: "Reception / Admin", href: "/jobs?category=Reception+%2F+Admin" },
-  { label: "Accounting", href: "/jobs?category=Accounting" },
-  { label: "IT / Management", href: "/jobs?category=IT+%2F+Management" },
-];
 
 const CANDIDATE_STEPS = [
   {
@@ -108,7 +98,7 @@ export default function HomeContent({
                 className="mt-4 text-lg text-slate-600 max-w-2xl mx-auto"
               >
                 Urban Jobs connects job seekers and employers in Dhangadhi. Complete the candidate form to register your
-                profile, browse open roles below when you want listings, or post a vacancy as an employer.
+                profile, or post a vacancy as an employer.
               </motion.p>
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
@@ -133,42 +123,7 @@ export default function HomeContent({
               </motion.div>
             </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="mt-10 max-w-3xl mx-auto rounded-2xl border border-slate-200 bg-slate-50/80 p-4 sm:p-6 shadow-sm"
-            >
-              <p className="text-center text-sm font-semibold text-slate-700 mb-4">Search jobs</p>
-              <div className="grid sm:grid-cols-2 gap-3">
-                <div className="relative">
-                  <HiOutlineMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                  <Link
-                    href="/jobs"
-                    className="flex items-center w-full pl-11 pr-4 py-3.5 rounded-xl bg-white border border-slate-200 text-left text-slate-800 font-medium hover:border-primary/40 hover:ring-1 hover:ring-primary/20 transition-all"
-                  >
-                    Browse all categories
-                  </Link>
-                </div>
-                <div className="relative">
-                  <HiOutlineMapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                  <div className="flex items-center w-full pl-11 pr-4 py-3.5 rounded-xl bg-white border border-slate-200 text-slate-600">
-                    Dhangadhi
-                  </div>
-                </div>
-              </div>
-              <div className="mt-4 flex flex-wrap justify-center gap-2">
-                {CATEGORIES.slice(0, 5).map((cat) => (
-                  <Link
-                    key={cat.href}
-                    href={cat.href}
-                    className="px-3 py-1.5 rounded-full text-xs font-medium bg-white border border-slate-200 text-slate-700 hover:border-primary hover:text-primary transition-colors"
-                  >
-                    {cat.label}
-                  </Link>
-                ))}
-              </div>
-            </motion.div>
+            {/* Browse jobs removed from home per request */}
           </div>
         </section>
 
