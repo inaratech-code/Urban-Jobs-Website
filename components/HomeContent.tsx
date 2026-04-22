@@ -261,74 +261,77 @@ export default function HomeContent({
           </div>
         </section>
 
-        {/* Job seeker — how it works */}
+        {/* Job seeker + Employer steps — side-by-side on desktop */}
         <section className="py-14 sm:py-16 bg-white border-y border-slate-100">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-slate-900 text-center">
-              Get started in 3 easy steps
-            </h2>
-            <p className="mt-2 text-slate-600 text-center max-w-xl mx-auto">
-              For job seekers — build your profile and get discovered by local employers.
-            </p>
-            <div className="mt-10 grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-              {CANDIDATE_STEPS.map((step, i) => (
-                <motion.div
-                  key={step.title}
-                  initial={{ opacity: 0, y: 12 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.06 }}
-                  className="rounded-2xl border border-slate-200 bg-slate-50/50 p-6 text-center"
-                >
-                  <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-cta-job/15 text-cta-job mb-4">
-                    <step.icon className="h-7 w-7" />
-                  </div>
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Step {i + 1}</p>
-                  <h3 className="mt-1 font-display font-bold text-lg text-slate-900">{step.title}</h3>
-                  <p className="mt-2 text-slate-600 text-sm leading-relaxed">{step.description}</p>
-                </motion.div>
-              ))}
-            </div>
-            <div className="mt-10 text-center">
-              <Link
-                href="/candidate"
-                className="inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold text-white bg-cta-job hover:bg-cta-job-hover transition-colors"
-              >
-                Fill a form
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* Employers — brand accent block + steps */}
-        <section className="py-14 sm:py-16 bg-primary text-white">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-2xl mx-auto">
-              <h2 className="font-display text-2xl sm:text-3xl font-bold">Hire staff for your business</h2>
-              <p className="mt-3 text-white/90 text-sm sm:text-base">
-                Post your vacancy and reach candidates in Dhangadhi. Simple forms, quick listing.
-              </p>
-              <Link
-                href="/employer"
-                className="inline-flex items-center gap-2 mt-6 px-8 py-3.5 rounded-xl bg-white text-primary font-bold shadow-lg hover:bg-slate-50 transition-colors"
-              >
-                Post a new job
-              </Link>
-            </div>
-            <div className="mt-12 grid md:grid-cols-3 gap-6">
-              {EMPLOYER_STEPS.map((step, i) => (
-                <div
-                  key={step.title}
-                  className="rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 p-6 text-center"
-                >
-                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-white/20 mb-3">
-                    <step.icon className="h-6 w-6 text-white" />
-                  </div>
-                  <p className="text-xs font-bold text-white/80 uppercase tracking-wide">Step {i + 1}</p>
-                  <h3 className="mt-1 font-display font-bold text-lg">{step.title}</h3>
-                  <p className="mt-2 text-white/85 text-sm leading-relaxed">{step.description}</p>
+            <div className="grid gap-8 lg:grid-cols-2 lg:items-stretch">
+              {/* Job seeker — how it works */}
+              <div className="h-full">
+                <h2 className="font-display text-2xl sm:text-3xl font-bold text-slate-900 text-center">
+                  Get started in 3 easy steps
+                </h2>
+                <p className="mt-2 text-slate-600 text-center max-w-xl mx-auto">
+                  For job seekers — build your profile and get discovered by local employers.
+                </p>
+                <div className="mt-10 grid md:grid-cols-2 gap-6 max-w-5xl mx-auto lg:max-w-none">
+                  {CANDIDATE_STEPS.map((step, i) => (
+                    <motion.div
+                      key={step.title}
+                      initial={{ opacity: 0, y: 12 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.06 }}
+                      className="rounded-2xl border border-slate-200 bg-slate-50/50 p-6 text-center"
+                    >
+                      <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-cta-job/15 text-cta-job mb-4">
+                        <step.icon className="h-7 w-7" />
+                      </div>
+                      <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Step {i + 1}</p>
+                      <h3 className="mt-1 font-display font-bold text-lg text-slate-900">{step.title}</h3>
+                      <p className="mt-2 text-slate-600 text-sm leading-relaxed">{step.description}</p>
+                    </motion.div>
+                  ))}
                 </div>
-              ))}
+                <div className="mt-10 text-center">
+                  <Link
+                    href="/candidate"
+                    className="inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold text-white bg-cta-job hover:bg-cta-job-hover transition-colors"
+                  >
+                    Fill a form
+                  </Link>
+                </div>
+              </div>
+
+              {/* Employers — brand accent block + steps */}
+              <div className="h-full rounded-3xl bg-primary text-white px-6 py-10 sm:px-8 sm:py-12 shadow-lg border border-white/10">
+                <div className="text-center max-w-2xl mx-auto">
+                  <h2 className="font-display text-2xl sm:text-3xl font-bold">Hire staff for your business</h2>
+                  <p className="mt-3 text-white/90 text-sm sm:text-base">
+                    Post your vacancy and reach candidates in Dhangadhi. Simple forms, quick listing.
+                  </p>
+                  <Link
+                    href="/employer"
+                    className="inline-flex items-center gap-2 mt-6 px-8 py-3.5 rounded-xl bg-white text-primary font-bold shadow-lg hover:bg-slate-50 transition-colors"
+                  >
+                    Post a new job
+                  </Link>
+                </div>
+                <div className="mt-10 grid md:grid-cols-2 gap-6">
+                  {EMPLOYER_STEPS.map((step, i) => (
+                    <div
+                      key={step.title}
+                      className="rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 p-6 text-center"
+                    >
+                      <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-white/20 mb-3">
+                        <step.icon className="h-6 w-6 text-white" />
+                      </div>
+                      <p className="text-xs font-bold text-white/80 uppercase tracking-wide">Step {i + 1}</p>
+                      <h3 className="mt-1 font-display font-bold text-lg">{step.title}</h3>
+                      <p className="mt-2 text-white/85 text-sm leading-relaxed">{step.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </section>
