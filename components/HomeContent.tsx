@@ -228,7 +228,7 @@ export default function HomeContent({
                 <p className="mt-2 text-slate-600 text-center max-w-xl mx-auto">
                   For job seekers — build your profile and get discovered by local employers.
                 </p>
-                <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto lg:max-w-none">
+                <div className="mt-10 grid gap-6 grid-cols-1 w-full">
                   {CANDIDATE_STEPS.map((step, i) => (
                     <motion.div
                       key={step.title}
@@ -236,7 +236,7 @@ export default function HomeContent({
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: i * 0.06 }}
-                      className="rounded-2xl border border-slate-200 bg-slate-50/50 p-6 text-center"
+                      className="w-full rounded-2xl border border-slate-200 bg-slate-50/50 py-6 px-8 sm:px-10 text-center"
                     >
                       <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-cta-job/15 text-cta-job mb-4">
                         <step.icon className="h-7 w-7" />
@@ -271,11 +271,11 @@ export default function HomeContent({
                     Post a new job
                   </Link>
                 </div>
-                <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="mt-10 grid gap-6 grid-cols-1 w-full">
                   {EMPLOYER_STEPS.map((step, i) => (
                     <div
                       key={step.title}
-                      className="rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 p-6 text-center"
+                      className="w-full rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 py-6 px-8 sm:px-10 text-center"
                     >
                       <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-white/20 mb-3">
                         <step.icon className="h-6 w-6 text-white" />
