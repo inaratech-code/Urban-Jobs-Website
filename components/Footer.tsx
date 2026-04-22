@@ -59,11 +59,6 @@ export default function Footer() {
                   Home
                 </Link>
               </li>
-              <li>
-                <Link href="/admin" className="text-slate-300 hover:text-white transition-colors">
-                  Admin
-                </Link>
-              </li>
             </ul>
           </div>
         </div>
