@@ -78,3 +78,11 @@ export async function adminGetJobRequests() {
   return json.requests;
 }
 
+export async function adminPurgeAllData(body: { confirm: string; password?: string }) {
+  await adminFetchJson("/api/admin/purge", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+

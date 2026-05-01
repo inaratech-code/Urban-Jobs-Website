@@ -9,10 +9,12 @@ import {
   reauthenticateWithCredential,
   updatePassword,
 } from "firebase/auth";
+import { adminPurgeAllData } from "@/lib/admin-api";
 
 export default function AdminSettingsPage() {
   const router = useRouter();
   const [resetting, setResetting] = useState(false);
+  const [purging, setPurging] = useState(false);
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -21,6 +23,10 @@ export default function AdminSettingsPage() {
   const [error, setError] = useState<string | null>(null);
 
   const isDemo = useMemo(() => hasDemoSession(), []);
+  const DELETE_PASSWORD =
+    process.env.NEXT_PUBLIC_ADMIN_DELETE_PASSWORD ||
+    process.env.NEXT_PUBLIC_DEMO_ADMIN_PASSWORD ||
+    "Demo@123";
 
   const handleReset = async () => {
     if (!confirm("Reset admin session and sign out?")) return;
@@ -72,6 +78,39 @@ export default function AdminSettingsPage() {
       setError(e instanceof Error ? e.message : "Password update failed.");
     } finally {
       setChanging(false);
+    }
+  };
+
+  const handlePurge = async () => {
+    setMessage(null);
+    setError(null);
+    if (isDemo) {
+      setError("Demo admin cannot delete live data. Sign in with a real Firebase admin account.");
+      return;
+    }
+
+    const inputConfirm = prompt('Type "DELETE ALL DATA" to confirm:');
+    if (!inputConfirm) return;
+    if (inputConfirm !== "DELETE ALL DATA") {
+      setError('Confirmation text did not match. Type "DELETE ALL DATA" exactly.');
+      return;
+    }
+
+    const inputPassword = prompt("Enter admin delete password to continue:");
+    if (inputPassword === null) return;
+    if (inputPassword !== DELETE_PASSWORD) {
+      setError("Invalid admin delete password.");
+      return;
+    }
+
+    setPurging(true);
+    try {
+      await adminPurgeAllData({ confirm: inputConfirm, password: inputPassword });
+      setMessage("All data deleted successfully.");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Delete failed.");
+    } finally {
+      setPurging(false);
     }
   };
 
@@ -137,6 +176,23 @@ export default function AdminSettingsPage() {
               {changing ? "Updating..." : "Update password"}
             </button>
           </div>
+        </div>
+      </section>
+
+      <section className="mt-4 bg-white rounded-2xl shadow-soft border border-red-100 p-6">
+        <h2 className="font-display font-semibold text-slate-800">Danger zone</h2>
+        <p className="mt-1 text-sm text-slate-600">
+          Permanently deletes data from Firestore (jobs, employers, candidates, applications, job requests, analytics).
+        </p>
+        <div className="mt-4">
+          <button
+            type="button"
+            onClick={handlePurge}
+            disabled={purging}
+            className="px-4 py-2.5 rounded-xl bg-red-600 text-white hover:bg-red-700 disabled:opacity-60"
+          >
+            {purging ? "Deleting..." : "Delete data"}
+          </button>
         </div>
       </section>
     </div>
