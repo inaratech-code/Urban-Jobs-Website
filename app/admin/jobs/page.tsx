@@ -10,13 +10,18 @@ import { adminDeleteJob, adminFetchJobs, adminUpdateJob } from "@/lib/admin-jobs
 export default function AdminJobsPage() {
   const [list, setList] = useState<(Job & { id: string })[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [statusVal, setStatusVal] = useState<"active" | "closed">("active");
 
   const load = () => {
+    setError(null);
     adminFetchJobs()
       .then(setList)
-      .catch(() => setList([]))
+      .catch((e: unknown) => {
+        setList([]);
+        setError(e instanceof Error ? e.message : "Failed to load jobs.");
+      })
       .finally(() => setLoading(false));
   };
 
@@ -61,6 +66,11 @@ export default function AdminJobsPage() {
         Approve new listings before they appear on the site. Use <span className="font-medium">Featured</span> to mark
         roles for optional highlight use.
       </p>
+      {error && (
+        <div className="mt-6 p-4 rounded-xl bg-red-50 text-red-700 text-sm">
+          {error}
+        </div>
+      )}
       {loading ? (
         <div className="mt-8">
           <TableSkeleton rows={6} />
