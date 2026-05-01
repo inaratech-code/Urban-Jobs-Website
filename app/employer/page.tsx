@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import JobForm, { type JobFormValues } from "@/components/JobForm";
-import { createJobAsGuest } from "@/lib/firestore";
 import { HiOutlineBuildingOffice2 } from "react-icons/hi2";
 
 export default function EmployerPage() {
@@ -15,7 +14,15 @@ export default function EmployerPage() {
   const handleSubmit = async (data: JobFormValues) => {
     setLoading(true);
     try {
-      await createJobAsGuest(data);
+      const res = await fetch("/api/jobs/guest", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const json = (await res.json()) as { error?: string };
+      if (!res.ok) {
+        throw new Error(json.error || "Failed to submit job.");
+      }
       setSuccess(true);
     } finally {
       setLoading(false);
