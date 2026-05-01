@@ -12,6 +12,7 @@ import {
   HiOutlineBriefcase,
   HiOutlineClipboardDocumentList,
   HiOutlineChartBarSquare,
+  HiOutlineCog6Tooth,
   HiArrowRightOnRectangle,
   HiOutlineInboxArrowDown,
   HiOutlineRectangleStack,
@@ -28,6 +29,7 @@ const nav = [
   { href: "/admin/jobs", label: "Jobs", icon: HiOutlineBriefcase },
   { href: "/admin/applications", label: "Applications", icon: HiOutlineClipboardDocumentList },
   { href: "/admin/job-requests", label: "Job requests", icon: HiOutlineInboxArrowDown },
+  { href: "/admin/settings", label: "Settings", icon: HiOutlineCog6Tooth },
 ];
 
 function AdminShell({ user, children }: { user: { email: string | null }; children: React.ReactNode }) {

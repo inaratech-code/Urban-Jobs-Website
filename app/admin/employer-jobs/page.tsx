@@ -5,13 +5,15 @@ import { TableSkeleton } from "@/components/admin/AdminSkeleton";
 import type { Employer, EmployerJobPipelineStatus, Job } from "@/types";
 import { EMPLOYER_JOB_PIPELINE_OPTIONS } from "@/lib/workflow-options";
 import { adminGetEmployers } from "@/lib/admin-api";
-import { adminFetchJobs, adminUpdateJob } from "@/lib/admin-jobs-api";
+import { adminDeleteJob, adminFetchJobs, adminUpdateJob } from "@/lib/admin-jobs-api";
+import { HiOutlineTrash } from "react-icons/hi2";
 
 export default function AdminEmployerJobsPage() {
   const [jobs, setJobs] = useState<(Job & { id: string })[]>([]);
   const [employers, setEmployers] = useState<(Employer & { id: string })[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const [filterEmployerTag, setFilterEmployerTag] = useState("");
   const [filterIndustry, setFilterIndustry] = useState("");
@@ -97,6 +99,19 @@ export default function AdminEmployerJobsPage() {
       alert("Could not update status.");
     } finally {
       setUpdatingId(null);
+    }
+  };
+
+  const handleDelete = async (id: string, title: string) => {
+    if (!confirm(`Delete job "${title}"? This cannot be undone.`)) return;
+    setDeletingId(id);
+    try {
+      await adminDeleteJob(id);
+      load();
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Delete failed.");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -209,7 +224,7 @@ export default function AdminEmployerJobsPage() {
                       </label>
                       <select
                         value={pipeline}
-                        disabled={updatingId === job.id}
+                        disabled={updatingId === job.id || deletingId === job.id}
                         onChange={(e) =>
                           handlePipeline(
                             job.id,
@@ -224,6 +239,18 @@ export default function AdminEmployerJobsPage() {
                           </option>
                         ))}
                       </select>
+                    </div>
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(job.id, job.title)}
+                        disabled={deletingId === job.id}
+                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm text-red-600 hover:bg-red-50 disabled:opacity-60"
+                        title="Delete job"
+                      >
+                        <HiOutlineTrash className="h-5 w-5" />
+                        {deletingId === job.id ? "Deleting..." : "Delete"}
+                      </button>
                     </div>
                   </article>
                 );
