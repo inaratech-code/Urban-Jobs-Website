@@ -1,6 +1,6 @@
 import "server-only";
 
-import { getAuth } from "firebase-admin/auth";
+import { getAdminAuth } from "@/lib/firebase-admin";
 
 function getAdminEmailAllowlist(): string[] {
   const raw = process.env.ADMIN_EMAILS || process.env.NEXT_PUBLIC_ADMIN_EMAILS || "";
@@ -16,7 +16,7 @@ export async function requireAdmin(request: Request): Promise<{ uid: string; ema
   if (!m) throw new Error("Missing Authorization header.");
   const idToken = m[1]!;
 
-  const decoded = await getAuth().verifyIdToken(idToken);
+  const decoded = await getAdminAuth().verifyIdToken(idToken);
   const email = (decoded.email || "").toLowerCase();
   if (!email) throw new Error("Missing email on auth token.");
 

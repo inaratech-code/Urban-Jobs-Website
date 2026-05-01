@@ -1,6 +1,7 @@
 import "server-only";
 
-import { cert, getApps, initializeApp } from "firebase-admin/app";
+import { cert, getApps, initializeApp, type App } from "firebase-admin/app";
+import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 
 let cachedServiceAccount: Record<string, unknown> | null | undefined;
@@ -31,7 +32,7 @@ function getServiceAccount() {
   }
 }
 
-export function getAdminDb() {
+export function getAdminApp(): App {
   if (!getApps().length) {
     const serviceAccount = getServiceAccount();
     if (!serviceAccount) {
@@ -41,6 +42,14 @@ export function getAdminDb() {
     }
     initializeApp({ credential: cert(serviceAccount as Parameters<typeof cert>[0]) });
   }
-  return getFirestore();
+  return getApps()[0] as App;
+}
+
+export function getAdminDb() {
+  return getFirestore(getAdminApp());
+}
+
+export function getAdminAuth() {
+  return getAuth(getAdminApp());
 }
 
