@@ -2,17 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { TableSkeleton } from "@/components/admin/AdminSkeleton";
-import { getJobRequests } from "@/lib/firestore";
 import type { JobRequest } from "@/types";
 import { toDate } from "@/lib/utils";
+import { adminGetJobRequests } from "@/lib/admin-api";
 
 export default function AdminJobRequestsPage() {
   const [list, setList] = useState<(JobRequest & { id: string })[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getJobRequests()
-      .then(setList)
+    adminGetJobRequests()
+      .then((rows) => setList(rows as (JobRequest & { id: string })[]))
       .catch(() => setList([]))
       .finally(() => setLoading(false));
   }, []);

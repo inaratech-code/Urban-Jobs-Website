@@ -53,7 +53,11 @@ export async function POST(req: Request) {
   try {
     const db = getAdminDb();
 
-    const employerRef = await db.collection("employers").add({
+    const employerRef = db.collection("employers").doc();
+    const jobRef = db.collection("jobs").doc();
+    const batch = db.batch();
+
+    batch.set(employerRef, {
       companyName,
       contactPerson,
       phone,
@@ -63,7 +67,7 @@ export async function POST(req: Request) {
       createdAt: FieldValue.serverTimestamp(),
     });
 
-    const jobRef = await db.collection("jobs").add({
+    batch.set(jobRef, {
       employerId: employerRef.id,
       title,
       category,
@@ -78,6 +82,7 @@ export async function POST(req: Request) {
       createdAt: FieldValue.serverTimestamp(),
     });
 
+    await batch.commit();
     return NextResponse.json({ ok: true, employerId: employerRef.id, jobId: jobRef.id });
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Failed to submit job.";

@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import DashboardStats from "@/components/DashboardStats";
 import { DashboardSkeleton } from "@/components/admin/AdminSkeleton";
-import { getCandidates, getEmployers, getJobsForAdmin, getApplications } from "@/lib/firestore";
 import { toDate } from "@/lib/utils";
+import { adminGetApplications, adminGetCandidates, adminGetEmployers } from "@/lib/admin-api";
+import { adminFetchJobs } from "@/lib/admin-jobs-api";
 
 type ActivityItem = {
   type: "candidate" | "employer" | "job" | "application";
@@ -26,39 +27,39 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     let cancelled = false;
     Promise.all([
-      getCandidates(),
-      getEmployers(),
-      getJobsForAdmin(),
-      getApplications(),
+      adminGetCandidates(),
+      adminGetEmployers(),
+      adminFetchJobs(),
+      adminGetApplications(),
     ])
       .then(([candidates, employers, jobs, applications]) => {
         if (cancelled) return;
-        const activeJobs = jobs.filter((j) => j.status === "active").length;
+        const activeJobs = (jobs as any[]).filter((j) => j.status === "active").length;
         setStats({
-          candidates: candidates.length,
-          employers: employers.length,
-          jobs: jobs.length,
-          applications: applications.length,
+          candidates: (candidates as any[]).length,
+          employers: (employers as any[]).length,
+          jobs: (jobs as any[]).length,
+          applications: (applications as any[]).length,
           activeJobs,
         });
 
         const items: ActivityItem[] = [
-          ...candidates.slice(0, 6).map((c) => ({
+          ...(candidates as any[]).slice(0, 6).map((c) => ({
             type: "candidate" as const,
             label: `${c.fullName || "Candidate"} submitted profile`,
             createdAt: toDate(c.createdAt),
           })),
-          ...employers.slice(0, 6).map((e) => ({
+          ...(employers as any[]).slice(0, 6).map((e) => ({
             type: "employer" as const,
             label: `${e.companyName || "Employer"} joined`,
             createdAt: toDate(e.createdAt),
           })),
-          ...jobs.slice(0, 6).map((j) => ({
+          ...(jobs as any[]).slice(0, 6).map((j) => ({
             type: "job" as const,
             label: `${j.title || "Job"} posted`,
             createdAt: toDate(j.createdAt),
           })),
-          ...applications.slice(0, 10).map((a) => ({
+          ...(applications as any[]).slice(0, 10).map((a) => ({
             type: "application" as const,
             label: `New application (${a.status})`,
             createdAt: toDate(a.createdAt as any),

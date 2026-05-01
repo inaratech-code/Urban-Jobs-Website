@@ -1,18 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getEmployers, updateEmployer } from "@/lib/firestore";
 import type { Employer } from "@/types";
 import { HiOutlineCheck, HiOutlineNoSymbol } from "react-icons/hi2";
 import { TableSkeleton } from "@/components/admin/AdminSkeleton";
+import { adminGetEmployers, adminUpdateEmployer } from "@/lib/admin-api";
 
 export default function AdminEmployersPage() {
   const [list, setList] = useState<(Employer & { id: string })[]>([]);
   const [loading, setLoading] = useState(true);
 
   const load = () => {
-    getEmployers()
-      .then(setList)
+    adminGetEmployers()
+      .then((rows) => setList(rows as (Employer & { id: string })[]))
       .catch(() => setList([]))
       .finally(() => setLoading(false));
   };
@@ -22,12 +22,12 @@ export default function AdminEmployersPage() {
   }, []);
 
   const handleApprove = async (id: string) => {
-    await updateEmployer(id, { approved: true, disabled: false });
+    await adminUpdateEmployer(id, { approved: true, disabled: false });
     load();
   };
 
   const handleDisable = async (id: string) => {
-    await updateEmployer(id, { disabled: true });
+    await adminUpdateEmployer(id, { disabled: true });
     load();
   };
 
@@ -36,7 +36,7 @@ export default function AdminEmployersPage() {
     employerTagId: string,
     industryCategory: string
   ) => {
-    await updateEmployer(id, {
+    await adminUpdateEmployer(id, {
       employerTagId: employerTagId.trim() || undefined,
       industryCategory: industryCategory.trim() || undefined,
     });

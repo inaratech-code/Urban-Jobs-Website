@@ -2,15 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { TableSkeleton } from "@/components/admin/AdminSkeleton";
-import {
-  deleteCandidate,
-  getCandidates,
-  updateCandidate,
-} from "@/lib/firestore";
 import type { Candidate, CandidateWorkflowStatus } from "@/types";
 import { CANDIDATE_WORKFLOW_OPTIONS } from "@/lib/workflow-options";
 import { toDate } from "@/lib/utils";
 import { HiOutlineTrash } from "react-icons/hi2";
+import { adminDeleteCandidate, adminGetCandidates, adminUpdateCandidate } from "@/lib/admin-api";
 
 export default function AdminCandidatesPage() {
   const [list, setList] = useState<(Candidate & { id: string })[]>([]);
@@ -26,8 +22,8 @@ export default function AdminCandidatesPage() {
     "Demo@123";
 
   const load = () => {
-    getCandidates()
-      .then(setList)
+    adminGetCandidates()
+      .then((rows) => setList(rows as (Candidate & { id: string })[]))
       .catch(() => setList([]))
       .finally(() => setLoading(false));
   };
@@ -57,7 +53,7 @@ export default function AdminCandidatesPage() {
   ) => {
     setUpdatingId(id);
     try {
-      await updateCandidate(id, { workflowStatus });
+      await adminUpdateCandidate(id, { workflowStatus });
       load();
     } catch {
       alert("Could not update status. Try again.");
@@ -79,7 +75,7 @@ export default function AdminCandidatesPage() {
 
     setDeletingId(id);
     try {
-      await deleteCandidate(id);
+      await adminDeleteCandidate(id);
       load();
     } catch {
       alert("Delete failed. Please try again.");

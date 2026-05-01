@@ -1,14 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  getApplications,
-  getCandidate,
-  getJob,
-  updateApplicationStatus,
-} from "@/lib/firestore";
 import type { Application, ApplicationStatus } from "@/types";
 import { TableSkeleton } from "@/components/admin/AdminSkeleton";
+import { adminGetApplications, adminUpdateApplication } from "@/lib/admin-api";
 
 const STATUS_OPTIONS: ApplicationStatus[] = [
   "Applied",
@@ -30,22 +25,8 @@ export default function AdminApplicationsPage() {
 
   const load = async () => {
     try {
-      const apps = await getApplications();
-      const withDetails: AppWithDetails[] = await Promise.all(
-        apps.map(async (a) => {
-          const [candidate, job] = await Promise.all([
-            getCandidate(a.candidateId),
-            getJob(a.jobId),
-          ]);
-          return {
-            ...a,
-            jobTitle: job?.title,
-            candidateName: candidate?.fullName,
-            companyName: job?.companyName,
-          };
-        })
-      );
-      setList(withDetails);
+      const apps = await adminGetApplications();
+      setList(apps as AppWithDetails[]);
     } catch {
       setList([]);
     } finally {
@@ -58,7 +39,7 @@ export default function AdminApplicationsPage() {
   }, []);
 
   const handleStatusChange = async (id: string, status: ApplicationStatus) => {
-    await updateApplicationStatus(id, status);
+    await adminUpdateApplication(id, { status });
     load();
   };
 

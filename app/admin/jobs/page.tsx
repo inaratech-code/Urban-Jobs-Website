@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getJobsForAdmin, updateJob, deleteJob } from "@/lib/firestore";
 import type { Job } from "@/types";
 import { HiOutlinePencil, HiOutlineTrash, HiOutlineXCircle } from "react-icons/hi2";
 import { TableSkeleton } from "@/components/admin/AdminSkeleton";
+import { adminDeleteJob, adminFetchJobs, adminUpdateJob } from "@/lib/admin-jobs-api";
 
 export default function AdminJobsPage() {
   const [list, setList] = useState<(Job & { id: string })[]>([]);
@@ -14,7 +14,7 @@ export default function AdminJobsPage() {
   const [statusVal, setStatusVal] = useState<"active" | "closed">("active");
 
   const load = () => {
-    getJobsForAdmin()
+    adminFetchJobs()
       .then(setList)
       .catch(() => setList([]))
       .finally(() => setLoading(false));
@@ -28,28 +28,28 @@ export default function AdminJobsPage() {
     j.adminApproved === false ? "Pending" : "Approved";
 
   const handleApprove = async (id: string) => {
-    await updateJob(id, { adminApproved: true });
+    await adminUpdateJob(id, { adminApproved: true } as Partial<Job>);
     load();
   };
 
   const handleToggleFeatured = async (id: string, current: boolean | undefined) => {
-    await updateJob(id, { featured: !current });
+    await adminUpdateJob(id, { featured: !current } as Partial<Job>);
     load();
   };
 
   const handleClose = async (id: string) => {
-    await updateJob(id, { status: "closed" });
+    await adminUpdateJob(id, { status: "closed" } as Partial<Job>);
     load();
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this job? This cannot be undone.")) return;
-    await deleteJob(id);
+    await adminDeleteJob(id);
     load();
   };
 
   const handleStatusChange = async (id: string) => {
-    await updateJob(id, { status: statusVal });
+    await adminUpdateJob(id, { status: statusVal } as Partial<Job>);
     setEditingId(null);
     load();
   };

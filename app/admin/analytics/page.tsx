@@ -2,9 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { TableSkeleton } from "@/components/admin/AdminSkeleton";
-import { getApplications, getJobsForAdmin, getWebViews } from "@/lib/firestore";
 import type { ApplicationStatus, Job } from "@/types";
 import { toDate } from "@/lib/utils";
+import { adminGetAnalytics } from "@/lib/admin-api";
 
 function BarRow({
   label,
@@ -65,8 +65,8 @@ export default function AdminAnalyticsPage() {
 
   useEffect(() => {
     let cancelled = false;
-    Promise.all([getJobsForAdmin(), getApplications(), getWebViews()])
-      .then(([j, a, w]) => {
+    adminGetAnalytics()
+      .then(({ jobs: j, applications: a, webViews: w }) => {
         if (cancelled) return;
         setJobs(j);
         setApplications(a as unknown as { status: ApplicationStatus; createdAt: unknown }[]);

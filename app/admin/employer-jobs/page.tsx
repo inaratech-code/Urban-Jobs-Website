@@ -2,13 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { TableSkeleton } from "@/components/admin/AdminSkeleton";
-import {
-  getEmployers,
-  getJobsForAdmin,
-  updateJob,
-} from "@/lib/firestore";
 import type { Employer, EmployerJobPipelineStatus, Job } from "@/types";
 import { EMPLOYER_JOB_PIPELINE_OPTIONS } from "@/lib/workflow-options";
+import { adminGetEmployers } from "@/lib/admin-api";
+import { adminFetchJobs, adminUpdateJob } from "@/lib/admin-jobs-api";
 
 export default function AdminEmployerJobsPage() {
   const [jobs, setJobs] = useState<(Job & { id: string })[]>([]);
@@ -21,10 +18,10 @@ export default function AdminEmployerJobsPage() {
   const [filterJobCategory, setFilterJobCategory] = useState("");
 
   const load = () => {
-    Promise.all([getJobsForAdmin(), getEmployers()])
+    Promise.all([adminFetchJobs(), adminGetEmployers()])
       .then(([j, e]) => {
-        setJobs(j);
-        setEmployers(e);
+        setJobs(j as (Job & { id: string })[]);
+        setEmployers(e as (Employer & { id: string })[]);
       })
       .catch(() => {
         setJobs([]);
@@ -94,7 +91,7 @@ export default function AdminEmployerJobsPage() {
   const handlePipeline = async (id: string, pipelineStatus: EmployerJobPipelineStatus) => {
     setUpdatingId(id);
     try {
-      await updateJob(id, { pipelineStatus });
+      await adminUpdateJob(id, { pipelineStatus } as Partial<Job>);
       load();
     } catch {
       alert("Could not update status.");
