@@ -71,7 +71,11 @@ export default function JobForm({ onSubmit, isLoading }: JobFormProps) {
       await onSubmit(form);
       setForm(initial);
     } catch (err) {
-      setError("Something went wrong. Please try again.");
+      const msg =
+        err instanceof Error && err.message
+          ? err.message
+          : "Something went wrong. Please try again.";
+      setError(msg);
     }
   };
 

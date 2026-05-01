@@ -131,6 +131,7 @@ export async function createEmployer(data: {
   email: string;
   address?: string;
 }) {
+  assertFirebaseConfigured();
   const docRef = await addDoc(collection(db, COLLECTIONS.employers), {
     ...data,
     approved: true,
@@ -156,6 +157,7 @@ export async function updateEmployer(
 
 // Jobs
 export async function createJob(data: JobFormData, employerId: string) {
+  assertFirebaseConfigured();
   const employer = await getDoc(doc(db, COLLECTIONS.employers, employerId));
   const companyName = employer.exists() ? (employer.data() as Employer).companyName : data.companyName;
   const docRef = await addDoc(collection(db, COLLECTIONS.jobs), {
@@ -176,6 +178,7 @@ export async function createJob(data: JobFormData, employerId: string) {
 }
 
 export async function createJobAsGuest(data: JobFormData) {
+  assertFirebaseConfigured();
   const employerRef = await addDoc(collection(db, COLLECTIONS.employers), {
     companyName: data.companyName,
     contactPerson: data.contactPerson,
@@ -258,6 +261,7 @@ export async function deleteJob(id: string) {
 
 // Applications
 export async function createApplication(jobId: string, candidateId: string) {
+  assertFirebaseConfigured();
   const job = await getJob(jobId);
   if (!job || !isJobPublicVisible(job)) {
     throw new Error("This job is not open for applications yet.");
@@ -335,6 +339,7 @@ export async function createJobRequest(data: {
   desiredRole: string;
   message?: string;
 }) {
+  assertFirebaseConfigured();
   const docRef = await addDoc(collection(db, COLLECTIONS.jobRequests), {
     ...data,
     createdAt: Timestamp.now(),
