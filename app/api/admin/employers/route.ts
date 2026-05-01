@@ -2,16 +2,21 @@ import { NextResponse } from "next/server";
 import { Timestamp } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase-admin";
 import { requireAdmin } from "@/lib/admin-api-auth";
+import { clampLimit, withTtlCache } from "@/lib/admin-api-cache";
 
 export async function GET(request: Request) {
   try {
     await requireAdmin(request);
-    const db = getAdminDb();
-    const snap = await db.collection("employers").orderBy("createdAt", "desc").get();
-    const employers = snap.docs.map((d) => {
-      const data = d.data();
-      const createdAt = data.createdAt instanceof Timestamp ? data.createdAt : data.createdAt;
-      return { id: d.id, ...data, createdAt };
+    const url = new URL(request.url);
+    const limit = clampLimit(url.searchParams.get("limit"), 300, 1000);
+    const employers = await withTtlCache(`admin:employers:${limit}`, 5000, async () => {
+      const db = getAdminDb();
+      const snap = await db.collection("employers").orderBy("createdAt", "desc").limit(limit).get();
+      return snap.docs.map((d) => {
+        const data = d.data();
+        const createdAt = data.createdAt instanceof Timestamp ? data.createdAt : data.createdAt;
+        return { id: d.id, ...data, createdAt };
+      });
     });
     return NextResponse.json({ ok: true, employers });
   } catch (e) {
