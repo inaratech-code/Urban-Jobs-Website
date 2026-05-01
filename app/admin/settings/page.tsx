@@ -23,10 +23,6 @@ export default function AdminSettingsPage() {
   const [error, setError] = useState<string | null>(null);
 
   const isDemo = useMemo(() => hasDemoSession(), []);
-  const DELETE_PASSWORD =
-    process.env.NEXT_PUBLIC_ADMIN_DELETE_PASSWORD ||
-    process.env.NEXT_PUBLIC_DEMO_ADMIN_PASSWORD ||
-    "Demo@123";
 
   const handleReset = async () => {
     if (!confirm("Reset admin session and sign out?")) return;
@@ -98,10 +94,6 @@ export default function AdminSettingsPage() {
 
     const inputPassword = prompt("Enter admin delete password to continue:");
     if (inputPassword === null) return;
-    if (inputPassword !== DELETE_PASSWORD) {
-      setError("Invalid admin delete password.");
-      return;
-    }
 
     setPurging(true);
     try {

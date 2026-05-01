@@ -36,10 +36,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const requiredPassword =
-      process.env.ADMIN_DELETE_PASSWORD ||
-      process.env.NEXT_PUBLIC_ADMIN_DELETE_PASSWORD ||
-      "";
+    const requiredPassword = process.env.ADMIN_DELETE_PASSWORD || "";
     if (requiredPassword.trim()) {
       if (!body?.password || body.password !== requiredPassword) {
         return NextResponse.json({ error: "Invalid admin delete password." }, { status: 401 });
